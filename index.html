@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geodätische Kugel Visualisierung!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h1>Geodätische Kugel</h1>
+            
+            <div class="control-group">
+                <label for="frequency">Frequenz (F):</label>
+                <input type="number" id="frequency" min="1" max="10" value="1">
+                <button id="updateBtn">Aktualisieren</button>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showFaces" checked>
+                    Flächen anzeigen
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showWireframe" checked>
+                    Gitter anzeigen
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="autoRotate" checked>
+                    Auto-Rotation
+                </label>
+            </div>
+            
+            <div class="info-panel">
+                <h3>Geometrie-Informationen</h3>
+                <div class="info-item">
+                    <span class="info-label">Anzahl Ecken:</span>
+                    <span id="vertexCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Anzahl Kanten:</span>
+                    <span id="edgeCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Unterschiedliche Kantenlängen:</span>
+                    <span id="edgeLengthCount">0</span>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>Steuerung</h3>
+                <ul>
+                    <li>Linke Maustaste: Rotation</li>
+                    <li>Rechte Maustaste: Pan</li>
+                    <li>Mausrad: Zoom</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="canvas-container"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
