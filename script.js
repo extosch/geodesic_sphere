@@ -1,5 +1,5 @@
-// Geodätische Kugel Visualisierung
-// Basierend auf Ikosaeder-Unterteilung
+// Geodesic Sphere Visualization
+// Based on Icosahedron Subdivision
 
 class GeodesicSphere {
     constructor() {
@@ -8,21 +8,21 @@ class GeodesicSphere {
         this.edges = new Set();
     }
 
-    // Erstelle ein reguläres Ikosaeder (F=1)
+    // Create a regular icosahedron (F=1)
     createIcosahedron() {
-        const t = (1.0 + Math.sqrt(5.0)) / 2.0; // Goldener Schnitt
+        const t = (1.0 + Math.sqrt(5.0)) / 2.0; // Golden ratio
         
-        // 12 Vertices eines Ikosaeders
+        // 12 vertices of an icosahedron
         this.vertices = [
             [-1,  t,  0], [ 1,  t,  0], [-1, -t,  0], [ 1, -t,  0],
             [ 0, -1,  t], [ 0,  1,  t], [ 0, -1, -t], [ 0,  1, -t],
             [ t,  0, -1], [ t,  0,  1], [-t,  0, -1], [-t,  0,  1]
         ];
         
-        // Normalisiere Vertices auf Einheitskugel
+        // Normalize vertices to unit sphere
         this.vertices = this.vertices.map(v => this.normalize(v));
         
-        // 20 Faces (gleichseitige Dreiecke)
+        // 20 faces (equilateral triangles)
         this.faces = [
             [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
             [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
@@ -31,13 +31,13 @@ class GeodesicSphere {
         ];
     }
 
-    // Normalisiere Vektor auf Einheitslänge
+    // Normalize vector to unit length
     normalize(v) {
         const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
         return [v[0] / length, v[1] / length, v[2] / length];
     }
 
-    // Mittelpunkt zwischen zwei Vertices
+    // Midpoint between two vertices
     getMidpoint(v1, v2) {
         return [
             (v1[0] + v2[0]) / 2,
@@ -46,9 +46,9 @@ class GeodesicSphere {
         ];
     }
 
-    // Finde oder erstelle Vertex
+    // Find or create vertex
     getOrCreateVertex(v) {
-        // Suche nach existierendem Vertex (mit Toleranz)
+        // Search for existing vertex (with tolerance)
         const tolerance = 0.0001;
         for (let i = 0; i < this.vertices.length; i++) {
             const existing = this.vertices[i];
@@ -59,50 +59,50 @@ class GeodesicSphere {
                 return i;
             }
         }
-        // Neuer Vertex
+        // New vertex
         this.vertices.push(v);
         return this.vertices.length - 1;
     }
 
-    // Unterteile ein Dreieck in frequency² kleinere Dreiecke
+    // Subdivide a triangle into frequency² smaller triangles
     subdivideFace(face, frequency) {
         const [v0, v1, v2] = face.map(i => this.vertices[i]);
         const newFaces = [];
         
-        // Erstelle Gitter von Punkten auf dem Dreieck
+        // Create grid of points on the triangle
         const points = [];
         for (let i = 0; i <= frequency; i++) {
             points[i] = [];
             for (let j = 0; j <= frequency - i; j++) {
-                // Baryzentrische Koordinaten
+                // Barycentric coordinates
                 const a = i / frequency;
                 const b = j / frequency;
                 const c = 1 - a - b;
                 
-                // Interpoliere Position
+                // Interpolate position
                 const p = [
                     v0[0] * c + v1[0] * a + v2[0] * b,
                     v0[1] * c + v1[1] * a + v2[1] * b,
                     v0[2] * c + v1[2] * a + v2[2] * b
                 ];
                 
-                // Projiziere auf Kugel
+                // Project onto sphere
                 const normalized = this.normalize(p);
                 points[i][j] = this.getOrCreateVertex(normalized);
             }
         }
         
-        // Erstelle Dreiecke aus dem Gitter
+        // Create triangles from the grid
         for (let i = 0; i < frequency; i++) {
             for (let j = 0; j < frequency - i; j++) {
-                // Erstes Dreieck (aufwärts zeigend)
+                // First triangle (upward pointing)
                 newFaces.push([
                     points[i][j],
                     points[i + 1][j],
                     points[i][j + 1]
                 ]);
                 
-                // Zweites Dreieck (abwärts zeigend) - falls vorhanden
+                // Second triangle (downward pointing) - if exists
                 if (j < frequency - i - 1) {
                     newFaces.push([
                         points[i][j + 1],
@@ -116,16 +116,16 @@ class GeodesicSphere {
         return newFaces;
     }
 
-    // Generiere geodätische Kugel mit gegebener Frequenz
+    // Generate geodesic sphere with given frequency
     generate(frequency) {
-        // Starte mit Ikosaeder
+        // Start with icosahedron
         this.createIcosahedron();
         
         if (frequency === 1) {
             return;
         }
         
-        // Unterteile jedes Face
+        // Subdivide each face
         const originalFaces = [...this.faces];
         this.faces = [];
         
@@ -135,19 +135,19 @@ class GeodesicSphere {
         }
     }
 
-    // Berechne Kanten aus Faces
+    // Calculate edges from faces
     calculateEdges() {
         this.edges = new Set();
         for (const face of this.faces) {
             const [a, b, c] = face;
-            // Sortiere Indices für konsistente Kanten-IDs
+            // Sort indices for consistent edge IDs
             this.edges.add(JSON.stringify([Math.min(a, b), Math.max(a, b)]));
             this.edges.add(JSON.stringify([Math.min(b, c), Math.max(b, c)]));
             this.edges.add(JSON.stringify([Math.min(c, a), Math.max(c, a)]));
         }
     }
 
-    // Berechne unterschiedliche Kantenlängen
+    // Calculate unique edge lengths
     getUniqueEdgeLengths() {
         const lengths = new Map();
         const tolerance = 0.0001;
@@ -162,7 +162,7 @@ class GeodesicSphere {
             const dz = v2[2] - v1[2];
             const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
             
-            // Finde oder erstelle Längen-Kategorie
+            // Find or create length category
             let found = false;
             for (const [key, count] of lengths) {
                 if (Math.abs(key - length) < tolerance) {
@@ -179,7 +179,7 @@ class GeodesicSphere {
         return lengths.size;
     }
 
-    // Erstelle Three.js Geometrie
+    // Create Three.js geometry
     createGeometry() {
         const geometry = new THREE.BufferGeometry();
         
@@ -237,13 +237,13 @@ function init() {
     scene.add(ambientLight);
     
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5); // Schräg rechts oben
+    directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
     
-    // Controls (OrbitControls simulation mit einfacher Implementierung)
+    // Controls (OrbitControls simulation with simple implementation)
     setupControls();
     
-    // Initiale Kugel
+    // Initial sphere
     updateSphere();
     
     // Event Listeners
@@ -272,9 +272,9 @@ function setupControls() {
     const panSpeed = 0.002;
     
     canvas.addEventListener('mousedown', (e) => {
-        if (e.button === 0) { // Linke Maustaste
+        if (e.button === 0) { // Left mouse button
             isDragging = true;
-        } else if (e.button === 2) { // Rechte Maustaste
+        } else if (e.button === 2) { // Right mouse button
             isPanning = true;
         }
         previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -327,22 +327,22 @@ function updateSphere() {
     const frequency = parseInt(document.getElementById('frequency').value);
     
     if (frequency < 1 || frequency > 10) {
-        alert('Frequenz muss zwischen 1 und 10 liegen!');
+        alert('Frequency must be between 1 and 10!');
         return;
     }
     
-    // Entferne alte Meshes
+    // Remove old meshes
     if (faceMesh) scene.remove(faceMesh);
     if (wireframeMesh) scene.remove(wireframeMesh);
     
-    // Generiere neue Kugel
+    // Generate new sphere
     geodesicSphere = new GeodesicSphere();
     geodesicSphere.generate(frequency);
     geodesicSphere.calculateEdges();
     
     const geometry = geodesicSphere.createGeometry();
     
-    // Face Mesh (Grau)
+    // Face mesh (gray)
     const faceMaterial = new THREE.MeshPhongMaterial({
         color: 0x808080,
         side: THREE.DoubleSide,
@@ -351,7 +351,7 @@ function updateSphere() {
     faceMesh = new THREE.Mesh(geometry, faceMaterial);
     scene.add(faceMesh);
     
-    // Wireframe Mesh (Weiß)
+    // Wireframe mesh (white)
     const wireframeMaterial = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         wireframe: true,
@@ -369,11 +369,13 @@ function updateSphere() {
 function updateInfo() {
     const vertexCount = geodesicSphere.vertices.length;
     const edgeCount = geodesicSphere.edges.size;
+    const faceCount = geodesicSphere.faces.length;
     const uniqueEdgeLengths = geodesicSphere.getUniqueEdgeLengths();
     
     document.getElementById('vertexCount').textContent = vertexCount;
     document.getElementById('edgeCount').textContent = edgeCount;
     document.getElementById('edgeLengthCount').textContent = uniqueEdgeLengths;
+    document.getElementById('faceCount').textContent = faceCount;
 }
 
 function updateVisibility() {

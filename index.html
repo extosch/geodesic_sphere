@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geodätische Kugel Visualisierung!</title>
+    <title>Geodesic Sphere Visualization!</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="controls">
-            <h1>Geodätische Kugel</h1>
+            <h1>Geodesic Sphere</h1>
             
             <div class="control-group">
-                <label for="frequency">Frequenz (F):</label>
+                <label for="frequency">Frequency (F):</label>
                 <input type="number" id="frequency" min="1" max="10" value="1">
-                <button id="updateBtn">Aktualisieren</button>
+                <button id="updateBtn">Update</button>
             </div>
             
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showFaces" checked>
-                    Flächen anzeigen
+                    Show Faces
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showWireframe" checked>
-                    Gitter anzeigen
+                    Show Wireframe
                 </label>
             </div>
             
@@ -39,27 +39,31 @@
             </div>
             
             <div class="info-panel">
-                <h3>Geometrie-Informationen</h3>
+                <h3>Geometry Information</h3>
                 <div class="info-item">
-                    <span class="info-label">Anzahl Ecken:</span>
+                    <span class="info-label">Number of Vertices:</span>
                     <span id="vertexCount">0</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Anzahl Kanten:</span>
+                    <span class="info-label">Number of Edges:</span>
                     <span id="edgeCount">0</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Unterschiedliche Kantenlängen:</span>
+                    <span class="info-label">Unique Edge Lengths:</span>
                     <span id="edgeLengthCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Number of Triangles:</span>
+                    <span id="faceCount">0</span>
                 </div>
             </div>
             
             <div class="instructions">
-                <h3>Steuerung</h3>
+                <h3>Controls</h3>
                 <ul>
-                    <li>Linke Maustaste: Rotation</li>
-                    <li>Rechte Maustaste: Pan</li>
-                    <li>Mausrad: Zoom</li>
+                    <li>Left Mouse Button: Rotation</li>
+                    <li>Right Mouse Button: Pan</li>
+                    <li>Mouse Wheel: Zoom</li>
                 </ul>
             </div>
         </div>
