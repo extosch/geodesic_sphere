@@ -321,6 +321,14 @@ let faceMesh, wireframeMesh;
 let geodesicSphere;
 let animationId;
 let autoRotate = true;
+let testStrutFacesMesh = null;
+let testStrutWireframeMesh = null;
+const strutParams = {
+    L: 1.0,  // Main length
+    B: 0.1,  // Width (semicircle radius = B/2)
+    R: 0.02, // Hole radius
+    color: 0x808080 // Gray (same as sphere faces)
+};
 
 function init() {
     const container = document.getElementById('canvas-container');
@@ -365,6 +373,8 @@ function init() {
     document.getElementById('autoRotate').addEventListener('change', (e) => {
         autoRotate = e.target.checked;
     });
+    document.getElementById('showTestStrutFaces').addEventListener('change', updateTestStrutVisibility);
+    document.getElementById('showTestStrutWireframe').addEventListener('change', updateTestStrutVisibility);
     document.getElementById('frequency').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') updateSphere();
     });
@@ -380,6 +390,9 @@ function init() {
     });
     
     window.addEventListener('resize', onWindowResize);
+    
+    // Show test strut
+    showTestStrut();
     
     // Animation
     animate();
@@ -413,6 +426,14 @@ function setupControls() {
             if (wireframeMesh) {
                 wireframeMesh.rotation.y = faceMesh.rotation.y;
                 wireframeMesh.rotation.x = faceMesh.rotation.x;
+            }
+            if (testStrutFacesMesh) {
+                testStrutFacesMesh.rotation.y = faceMesh.rotation.y;
+                testStrutFacesMesh.rotation.x = faceMesh.rotation.x;
+            }
+            if (testStrutWireframeMesh) {
+                testStrutWireframeMesh.rotation.y = faceMesh.rotation.y;
+                testStrutWireframeMesh.rotation.x = faceMesh.rotation.x;
             }
         } else if (isPanning) {
             const deltaX = e.clientX - previousMousePosition.x;
@@ -620,6 +641,14 @@ function animate() {
             wireframeMesh.rotation.y = faceMesh.rotation.y;
             wireframeMesh.rotation.x = faceMesh.rotation.x;
         }
+        if (testStrutFacesMesh) {
+            testStrutFacesMesh.rotation.y = faceMesh.rotation.y;
+            testStrutFacesMesh.rotation.x = faceMesh.rotation.x;
+        }
+        if (testStrutWireframeMesh) {
+            testStrutWireframeMesh.rotation.y = faceMesh.rotation.y;
+            testStrutWireframeMesh.rotation.x = faceMesh.rotation.x;
+        }
     }
     
     renderer.render(scene, camera);
@@ -630,6 +659,88 @@ function onWindowResize() {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+function createStrutShape(L, B, R) {
+    const shape = new THREE.Shape();
+    
+    // Start at bottom-left of rectangle
+    shape.moveTo(-L/2, -B/2);
+    
+    // Bottom edge to right
+    shape.lineTo(L/2, -B/2);
+    
+    // Right semicircle (from bottom to top)
+    shape.absarc(L/2, 0, B/2, -Math.PI/2, Math.PI/2, false);
+    
+    // Top edge to left
+    shape.lineTo(-L/2, B/2);
+    
+    // Left semicircle (from top to bottom)
+    shape.absarc(-L/2, 0, B/2, Math.PI/2, 3*Math.PI/2, false);
+    
+    // Add holes
+    const hole1 = new THREE.Path();
+    hole1.absarc(-L/2, 0, R, 0, Math.PI * 2, false);
+    shape.holes.push(hole1);
+    
+    const hole2 = new THREE.Path();
+    hole2.absarc(L/2, 0, R, 0, Math.PI * 2, false);
+    shape.holes.push(hole2);
+    
+    return shape;
+}
+
+function showTestStrut() {
+    // Remove existing test strut meshes if any
+    if (testStrutFacesMesh) {
+        scene.remove(testStrutFacesMesh);
+    }
+    if (testStrutWireframeMesh) {
+        scene.remove(testStrutWireframeMesh);
+    }
+    
+    // Create strut shape
+    const shape = createStrutShape(strutParams.L, strutParams.B, strutParams.R);
+    
+    // Create geometry from shape (2D, no extrusion)
+    const geometry = new THREE.ShapeGeometry(shape);
+    
+    // Create faces mesh
+    const facesMaterial = new THREE.MeshBasicMaterial({ 
+        color: strutParams.color,
+        side: THREE.DoubleSide
+    });
+    testStrutFacesMesh = new THREE.Mesh(geometry, facesMaterial);
+    testStrutFacesMesh.position.set(0, 0, 0);
+    
+    // Create wireframe mesh
+    const wireframeGeometry = new THREE.EdgesGeometry(geometry);
+    const wireframeMaterial = new THREE.LineBasicMaterial({ 
+        color: 0xffffff,
+        linewidth: 2
+    });
+    testStrutWireframeMesh = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+    testStrutWireframeMesh.position.set(0, 0, 0);
+    
+    // Add to scene
+    scene.add(testStrutFacesMesh);
+    scene.add(testStrutWireframeMesh);
+    
+    // Set visibility
+    updateTestStrutVisibility();
+}
+
+function updateTestStrutVisibility() {
+    const showFaces = document.getElementById('showTestStrutFaces').checked;
+    const showWireframe = document.getElementById('showTestStrutWireframe').checked;
+    
+    if (testStrutFacesMesh) {
+        testStrutFacesMesh.visible = showFaces;
+    }
+    if (testStrutWireframeMesh) {
+        testStrutWireframeMesh.visible = showWireframe;
+    }
 }
 
 // Initialisierung beim Laden
