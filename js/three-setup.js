@@ -37,27 +37,33 @@ function init() {
     // Initial sphere
     updateSphere();
     
+    // Update UI display for scaled connector offset
+    updateConnectorOffsetDisplay();
+    
     // Event Listeners
-    document.getElementById('updateBtn').addEventListener('click', updateSphere);
     document.getElementById('showFaces').addEventListener('change', updateVisibility);
     document.getElementById('showWireframe').addEventListener('change', updateVisibility);
     document.getElementById('autoRotate').addEventListener('change', (e) => {
         autoRotate = e.target.checked;
     });
-    document.getElementById('showTestStrutFaces').addEventListener('change', updateTestStrutVisibility);
-    document.getElementById('showTestStrutWireframe').addEventListener('change', updateTestStrutVisibility);
+    document.getElementById('showCenterTestStrut').addEventListener('change', updateTestStrutVisibility);
+    document.getElementById('showEdgeStrutsFaces').addEventListener('change', updateTestStrutVisibility);
+    document.getElementById('showEdgeStrutsWireframe').addEventListener('change', updateTestStrutVisibility);
     document.getElementById('exportDxfBtn').addEventListener('click', exportTestStrutToDXF);
     document.getElementById('testDxfBtn').addEventListener('click', exportSimpleCircleDXF);
-    document.getElementById('frequency').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') updateSphere();
+    document.getElementById('frequency').addEventListener('input', () => {
+        updateConnectorOffsetDisplay();
+        updateSphere();
     });
     document.getElementById('diameter').addEventListener('input', updateBuildInstructions);
     document.getElementById('diameter').addEventListener('change', updateBuildInstructions);
     document.getElementById('connectorOffset').addEventListener('input', () => {
+        updateBaseConnectorOffsetFromUI();
         updateBuildInstructions();
         updateSphere(); // Update 3D visualization with shortened struts
     });
     document.getElementById('connectorOffset').addEventListener('change', () => {
+        updateBaseConnectorOffsetFromUI();
         updateBuildInstructions();
         updateSphere(); // Update 3D visualization with shortened struts
     });
@@ -112,6 +118,14 @@ function setupControls() {
                 testStrutLabelMesh.rotation.y = faceMesh.rotation.y;
                 testStrutLabelMesh.rotation.x = faceMesh.rotation.x;
             }
+            if (edgeStrutFacesGroup) {
+                edgeStrutFacesGroup.rotation.y = faceMesh.rotation.y;
+                edgeStrutFacesGroup.rotation.x = faceMesh.rotation.x;
+            }
+            if (edgeStrutWireframeGroup) {
+                edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
+                edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
+            }
         } else if (isPanning) {
             const deltaX = e.clientX - previousMousePosition.x;
             const deltaY = e.clientY - previousMousePosition.y;
@@ -164,6 +178,14 @@ function animate() {
         if (testStrutLabelMesh) {
             testStrutLabelMesh.rotation.y = faceMesh.rotation.y;
             testStrutLabelMesh.rotation.x = faceMesh.rotation.x;
+        }
+        if (edgeStrutFacesGroup) {
+            edgeStrutFacesGroup.rotation.y = faceMesh.rotation.y;
+            edgeStrutFacesGroup.rotation.x = faceMesh.rotation.x;
+        }
+        if (edgeStrutWireframeGroup) {
+            edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
+            edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
         }
     }
     

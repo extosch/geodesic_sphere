@@ -14,7 +14,6 @@
             <div class="control-group">
                 <label for="frequency">Frequency (F):</label>
                 <input type="number" id="frequency" min="1" max="10" value="1">
-                <button id="updateBtn">Update</button>
             </div>
             
             <div class="control-group">
@@ -24,7 +23,7 @@
             
             <div class="control-group">
                 <label for="connectorOffset">Connector Offset (cm):</label>
-                <input type="number" id="connectorOffset" min="0" max="10" value="2" step="0.5">
+                <input type="number" id="connectorOffset" min="0" max="10" value="7" step="0.5">
                 <small style="display: block; color: #aaa; font-size: 11px; margin-top: 5px;">
                     Distance from hub center to strut end
                 </small>
@@ -32,35 +31,42 @@
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showFaces" checked>
+                    <input type="checkbox" id="showFaces">
                     Show Faces
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showWireframe" checked>
+                    <input type="checkbox" id="showWireframe">
                     Show Wireframe
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showTestStrutFaces" checked>
-                    Show Test Strut Faces
+                    <input type="checkbox" id="showEdgeStrutsFaces" checked>
+                    Show Edge Struts Faces
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showTestStrutWireframe" checked>
-                    Show Test Strut Wireframe
+                    <input type="checkbox" id="showEdgeStrutsWireframe" checked>
+                    Show Edge Struts Wireframe
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="autoRotate" checked>
+                    <input type="checkbox" id="showCenterTestStrut">
+                    Show Center Test Strut
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="autoRotate">
                     Auto-Rotation
                 </label>
             </div>

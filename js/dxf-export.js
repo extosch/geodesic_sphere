@@ -148,6 +148,9 @@ function exportSimpleCircleDXF() {
 }
 
 function exportTestStrutToDXF() {
+    // Get scaled parameters based on current frequency
+    const strutParams = getScaledStrutParams();
+    
     const L = strutParams.L;
     const B = strutParams.B;
     const R = strutParams.R;
@@ -155,7 +158,7 @@ function exportTestStrutToDXF() {
     // Scale factor: convert from unit sphere to cm based on first strut length
     const edges = geodesicSphere.getEdgeLengthDetails(
         parseFloat(document.getElementById('diameter').value) || 100,
-        parseFloat(document.getElementById('connectorOffset').value) || 0
+        getScaledConnectorOffset()
     );
     const scaleFactor = edges.length > 0 ? edges[0].length / L : 100;
     

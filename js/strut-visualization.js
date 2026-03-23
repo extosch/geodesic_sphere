@@ -1,6 +1,6 @@
 // 2D Strut Visualization
 // Creates and manages test strut display with capsule shape and holes
-// Note: strutParams is defined globally in main.js
+// Note: baseStrutParams is defined globally in main.js, scaled by frequency
 
 function createStrutShape(L, B, R) {
     const shape = new THREE.Shape();
@@ -40,6 +40,9 @@ function showTestStrut() {
     if (testStrutWireframeMesh) {
         scene.remove(testStrutWireframeMesh);
     }
+    
+    // Get scaled parameters based on current frequency
+    const strutParams = getScaledStrutParams();
     
     // Create strut shape
     const shape = createStrutShape(strutParams.L, strutParams.B, strutParams.R);
@@ -116,13 +119,164 @@ function showTestStrut() {
 }
 
 function updateTestStrutVisibility() {
-    const showFaces = document.getElementById('showTestStrutFaces').checked;
-    const showWireframe = document.getElementById('showTestStrutWireframe').checked;
+    const showCenter = document.getElementById('showCenterTestStrut').checked;
+    const showEdgeFaces = document.getElementById('showEdgeStrutsFaces').checked;
+    const showEdgeWireframe = document.getElementById('showEdgeStrutsWireframe').checked;
     
+    // Control center test strut (faces, wireframe, and label)
     if (testStrutFacesMesh) {
-        testStrutFacesMesh.visible = showFaces;
+        testStrutFacesMesh.visible = showCenter;
     }
     if (testStrutWireframeMesh) {
-        testStrutWireframeMesh.visible = showWireframe;
+        testStrutWireframeMesh.visible = showCenter;
     }
+    if (testStrutLabelMesh) {
+        testStrutLabelMesh.visible = showCenter;
+    }
+    
+    // Control edge struts separately
+    if (edgeStrutFacesGroup) {
+        edgeStrutFacesGroup.visible = showEdgeFaces;
+    }
+    if (edgeStrutWireframeGroup) {
+        edgeStrutWireframeGroup.visible = showEdgeWireframe;
+    }
+}
+
+function showStrutsOnEdges() {
+    // Remove existing edge struts if any
+    if (edgeStrutFacesGroup) {
+        scene.remove(edgeStrutFacesGroup);
+    }
+    if (edgeStrutWireframeGroup) {
+        scene.remove(edgeStrutWireframeGroup);
+    }
+    
+    if (!geodesicSphere) return;
+    
+    // Get scaled parameters based on current frequency
+    const strutParams = getScaledStrutParams();
+    
+    // Create groups for all edge struts
+    edgeStrutFacesGroup = new THREE.Group();
+    edgeStrutWireframeGroup = new THREE.Group();
+    
+    // Get edge colors to match strut types
+    const edgeColors = geodesicSphere.getEdgeColors();
+    
+    // Get connector offset for edge shortening
+    const connectorOffset = getScaledConnectorOffset();
+    const diameter = parseFloat(document.getElementById('diameter').value) || 100;
+    const radius = diameter / 2;
+    const offsetRatio = connectorOffset / radius; // Convert to unit sphere ratio
+    
+    // Create a strut for each edge
+    for (const edgeStr of geodesicSphere.edges) {
+        const [i, j] = JSON.parse(edgeStr);
+        const v1 = geodesicSphere.vertices[i];
+        const v2 = geodesicSphere.vertices[j];
+        
+        // Calculate original edge vector
+        const dx = v2[0] - v1[0];
+        const dy = v2[1] - v1[1];
+        const dz = v2[2] - v1[2];
+        const originalLength = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        
+        // Normalize direction
+        const dirX = dx / originalLength;
+        const dirY = dy / originalLength;
+        const dirZ = dz / originalLength;
+        
+        // Calculate shortened edge endpoints (shorten from both ends)
+        const start = [
+            v1[0] + dirX * offsetRatio,
+            v1[1] + dirY * offsetRatio,
+            v1[2] + dirZ * offsetRatio
+        ];
+        
+        const end = [
+            v2[0] - dirX * offsetRatio,
+            v2[1] - dirY * offsetRatio,
+            v2[2] - dirZ * offsetRatio
+        ];
+        
+        // Calculate shortened edge properties
+        const shortenedDx = end[0] - start[0];
+        const shortenedDy = end[1] - start[1];
+        const shortenedDz = end[2] - start[2];
+        const shortenedLength = Math.sqrt(shortenedDx * shortenedDx + shortenedDy * shortenedDy + shortenedDz * shortenedDz);
+        
+        // Calculate midpoint of shortened edge
+        const midX = (start[0] + end[0]) / 2;
+        const midY = (start[1] + end[1]) / 2;
+        const midZ = (start[2] + end[2]) / 2;
+        
+        // Create strut shape with shortened edge length
+        const shape = createStrutShape(shortenedLength, strutParams.B, strutParams.R);
+        const geometry = new THREE.ShapeGeometry(shape);
+        
+        // Get color for this edge
+        const edgeColor = edgeColors.get(edgeStr) || strutParams.color;
+        
+        // Create faces mesh
+        const facesMaterial = new THREE.MeshBasicMaterial({ 
+            color: edgeColor,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.8
+        });
+        const facesMesh = new THREE.Mesh(geometry, facesMaterial);
+        
+        // Create wireframe mesh
+        const wireframeGeometry = new THREE.EdgesGeometry(geometry);
+        const wireframeMaterial = new THREE.LineBasicMaterial({ 
+            color: 0xffffff,
+            linewidth: 1
+        });
+        const wireframeMesh = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+        
+        // Position at midpoint
+        facesMesh.position.set(midX, midY, midZ);
+        wireframeMesh.position.set(midX, midY, midZ);
+        
+        // Build coordinate system for strut orientation:
+        // X-axis: along edge (length direction)
+        // Y-axis: tangential to sphere (width direction)
+        // Z-axis: radial outward from sphere center (normal to surface)
+        
+        // X-axis = shortened edge direction (normalized)
+        const xAxis = new THREE.Vector3(shortenedDx, shortenedDy, shortenedDz).normalize();
+        
+        // Z-axis = radial direction at midpoint (normalized)
+        const zAxis = new THREE.Vector3(midX, midY, midZ).normalize();
+        
+        // Y-axis = Z cross X (tangential, perpendicular to both edge and radius)
+        const yAxis = new THREE.Vector3().crossVectors(zAxis, xAxis).normalize();
+        
+        // Re-orthogonalize Z-axis to ensure perfect right-handed system
+        // (in case edge and radius aren't perfectly perpendicular)
+        zAxis.crossVectors(xAxis, yAxis).normalize();
+        
+        // Create rotation matrix from the three axes
+        const rotationMatrix = new THREE.Matrix4();
+        rotationMatrix.makeBasis(xAxis, yAxis, zAxis);
+        
+        // Extract quaternion from matrix
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromRotationMatrix(rotationMatrix);
+        
+        facesMesh.quaternion.copy(quaternion);
+        wireframeMesh.quaternion.copy(quaternion);
+        
+        // Add to groups
+        edgeStrutFacesGroup.add(facesMesh);
+        edgeStrutWireframeGroup.add(wireframeMesh);
+    }
+    
+    // Add groups to scene
+    scene.add(edgeStrutFacesGroup);
+    scene.add(edgeStrutWireframeGroup);
+    
+    // Set visibility based on checkboxes
+    updateTestStrutVisibility();
 }

@@ -32,7 +32,7 @@ function updateSphere() {
     // Create colored wireframe based on edge lengths (shortened for connectors)
     wireframeMesh = new THREE.Group();
     const edgeColors = geodesicSphere.getEdgeColors();
-    const connectorOffset = parseFloat(document.getElementById('connectorOffset').value) || 0;
+    const connectorOffset = getScaledConnectorOffset();
     const diameter = parseFloat(document.getElementById('diameter').value) || 100;
     const radius = diameter / 2;
     const offsetRatio = connectorOffset / radius; // Convert to unit sphere ratio
@@ -90,6 +90,10 @@ function updateSphere() {
     // Update Info
     updateInfo();
     updateVisibility();
+    
+    // Update struts with new frequency-scaled parameters
+    showTestStrut();
+    showStrutsOnEdges();
 }
 
 function updateInfo() {
@@ -111,7 +115,7 @@ function updateBuildInstructions() {
     if (!geodesicSphere) return;
     
     const diameter = parseFloat(document.getElementById('diameter').value) || 100;
-    const connectorOffset = parseFloat(document.getElementById('connectorOffset').value) || 0;
+    const connectorOffset = getScaledConnectorOffset();
     
     // Color palette matching the 3D visualization
     const colors = [
