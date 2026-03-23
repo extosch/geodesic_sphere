@@ -46,13 +46,6 @@
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="autoRotate" checked>
-                    Auto-Rotation
-                </label>
-            </div>
-            
-            <div class="control-group">
-                <label>
                     <input type="checkbox" id="showTestStrutFaces" checked>
                     Show Test Strut Faces
                 </label>
@@ -63,6 +56,21 @@
                     <input type="checkbox" id="showTestStrutWireframe" checked>
                     Show Test Strut Wireframe
                 </label>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="autoRotate" checked>
+                    Auto-Rotation
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <button id="exportDxfBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export Test Strut as DXF</button>
+            </div>
+            
+            <div class="control-group">
+                <button id="testDxfBtn" style="width: 100%; padding: 10px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">TEST: Export Simple Circle DXF</button>
             </div>
             
             <div class="info-panel">
@@ -142,6 +150,11 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="script.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/geodesic-sphere.js"></script>
+    <script src="js/dxf-export.js"></script>
+    <script src="js/strut-visualization.js"></script>
+    <script src="js/sphere-visualization.js"></script>
+    <script src="js/three-setup.js"></script>
 </body>
 </html>
