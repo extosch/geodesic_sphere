@@ -18,6 +18,19 @@
             </div>
             
             <div class="control-group">
+                <label for="diameter">Diameter (cm):</label>
+                <input type="number" id="diameter" min="10" max="1000" value="100" step="10">
+            </div>
+            
+            <div class="control-group">
+                <label for="connectorOffset">Connector Offset (cm):</label>
+                <input type="number" id="connectorOffset" min="0" max="10" value="2" step="0.5">
+                <small style="display: block; color: #aaa; font-size: 11px; margin-top: 5px;">
+                    Distance from hub center to strut end
+                </small>
+            </div>
+            
+            <div class="control-group">
                 <label>
                     <input type="checkbox" id="showFaces" checked>
                     Show Faces
@@ -55,6 +68,49 @@
                 <div class="info-item">
                     <span class="info-label">Number of Triangles:</span>
                     <span id="faceCount">0</span>
+                </div>
+            </div>
+            
+            <div class="build-panel">
+                <h3>Build Instructions</h3>
+                
+                <div class="build-section">
+                    <h4>Struts (Sticks)</h4>
+                    <table class="build-table" id="strutTable">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Color</th>
+                                <th>Qty</th>
+                                <th>Length (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="build-section">
+                    <h4>Connectors (Hubs)</h4>
+                    <div class="connector-info">
+                        <div class="info-item">
+                            <span class="info-label">5-Arm Connectors:</span>
+                            <span id="connector5Count">12</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">6-Arm Connectors:</span>
+                            <span id="connector6Count">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="build-section">
+                    <h4>Patches (Triangles)</h4>
+                    <div class="info-item">
+                        <span class="info-label">Total Patches:</span>
+                        <span id="patchCount">20</span>
+                    </div>
                 </div>
             </div>
             

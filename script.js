@@ -179,6 +179,118 @@ class GeodesicSphere {
         return lengths.size;
     }
 
+    // Get detailed edge length information for building
+    getEdgeLengthDetails(diameter, connectorOffset = 0) {
+        const radius = diameter / 2;
+        const lengthMap = new Map();
+        const tolerance = 0.0001;
+        
+        for (const edgeStr of this.edges) {
+            const [i, j] = JSON.parse(edgeStr);
+            const v1 = this.vertices[i];
+            const v2 = this.vertices[j];
+            
+            const dx = v2[0] - v1[0];
+            const dy = v2[1] - v1[1];
+            const dz = v2[2] - v1[2];
+            const unitLength = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            const realLength = unitLength * radius - (2 * connectorOffset);
+            
+            // Find or create length category
+            let found = false;
+            for (const [key, data] of lengthMap) {
+                if (Math.abs(key - unitLength) < tolerance) {
+                    data.count++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                lengthMap.set(unitLength, { count: 1, realLength: realLength });
+            }
+        }
+        
+        // Sort by length and assign letters
+        const sorted = Array.from(lengthMap.entries())
+            .sort((a, b) => a[0] - b[0])
+            .map((entry, index) => ({
+                type: String.fromCharCode(65 + index), // A, B, C, D...
+                count: entry[1].count,
+                length: entry[1].realLength
+            }));
+        
+        return sorted;
+    }
+
+    // Get edge color based on length category
+    getEdgeColors() {
+        const lengthMap = new Map();
+        const tolerance = 0.0001;
+        const edgeColors = new Map();
+        
+        // First pass: categorize edges by length
+        for (const edgeStr of this.edges) {
+            const [i, j] = JSON.parse(edgeStr);
+            const v1 = this.vertices[i];
+            const v2 = this.vertices[j];
+            
+            const dx = v2[0] - v1[0];
+            const dy = v2[1] - v1[1];
+            const dz = v2[2] - v1[2];
+            const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            
+            // Find or create length category
+            let categoryLength = null;
+            for (const key of lengthMap.keys()) {
+                if (Math.abs(key - length) < tolerance) {
+                    categoryLength = key;
+                    break;
+                }
+            }
+            
+            if (categoryLength === null) {
+                categoryLength = length;
+                lengthMap.set(categoryLength, lengthMap.size);
+            }
+            
+            edgeColors.set(edgeStr, lengthMap.get(categoryLength));
+        }
+        
+        // Color palette (bright distinct colors)
+        const colors = [
+            0xff0000, // Red - Type A
+            0x00ff00, // Green - Type B
+            0x0000ff, // Blue - Type C
+            0xffff00, // Yellow - Type D
+            0xff00ff, // Magenta - Type E
+            0x00ffff, // Cyan - Type F
+        ];
+        
+        // Map category indices to colors
+        const result = new Map();
+        for (const [edgeStr, categoryIndex] of edgeColors) {
+            result.set(edgeStr, colors[categoryIndex % colors.length]);
+        }
+        
+        return result;
+    }
+
+    // Calculate vertex valences (5-way or 6-way connectors)
+    getVertexValences() {
+        const valences = new Array(this.vertices.length).fill(0);
+        
+        for (const edgeStr of this.edges) {
+            const [i, j] = JSON.parse(edgeStr);
+            valences[i]++;
+            valences[j]++;
+        }
+        
+        const count5 = valences.filter(v => v === 5).length;
+        const count6 = valences.filter(v => v === 6).length;
+        
+        return { count5, count6 };
+    }
+
     // Create Three.js geometry
     createGeometry() {
         const geometry = new THREE.BufferGeometry();
@@ -255,6 +367,16 @@ function init() {
     });
     document.getElementById('frequency').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') updateSphere();
+    });
+    document.getElementById('diameter').addEventListener('input', updateBuildInstructions);
+    document.getElementById('diameter').addEventListener('change', updateBuildInstructions);
+    document.getElementById('connectorOffset').addEventListener('input', () => {
+        updateBuildInstructions();
+        updateSphere(); // Update 3D visualization with shortened struts
+    });
+    document.getElementById('connectorOffset').addEventListener('change', () => {
+        updateBuildInstructions();
+        updateSphere(); // Update 3D visualization with shortened struts
     });
     
     window.addEventListener('resize', onWindowResize);
@@ -351,14 +473,62 @@ function updateSphere() {
     faceMesh = new THREE.Mesh(geometry, faceMaterial);
     scene.add(faceMesh);
     
-    // Wireframe mesh (white)
-    const wireframeMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.3
-    });
-    wireframeMesh = new THREE.Mesh(geometry, wireframeMaterial);
+    // Create colored wireframe based on edge lengths (shortened for connectors)
+    wireframeMesh = new THREE.Group();
+    const edgeColors = geodesicSphere.getEdgeColors();
+    const connectorOffset = parseFloat(document.getElementById('connectorOffset').value) || 0;
+    const diameter = parseFloat(document.getElementById('diameter').value) || 100;
+    const radius = diameter / 2;
+    const offsetRatio = connectorOffset / radius; // Convert to unit sphere ratio
+    
+    for (const edgeStr of geodesicSphere.edges) {
+        const [i, j] = JSON.parse(edgeStr);
+        const v1 = geodesicSphere.vertices[i];
+        const v2 = geodesicSphere.vertices[j];
+        
+        // Calculate direction vector
+        const dx = v2[0] - v1[0];
+        const dy = v2[1] - v1[1];
+        const dz = v2[2] - v1[2];
+        const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        
+        // Normalize direction
+        const dirX = dx / length;
+        const dirY = dy / length;
+        const dirZ = dz / length;
+        
+        // Shorten from both ends
+        const start = [
+            v1[0] + dirX * offsetRatio,
+            v1[1] + dirY * offsetRatio,
+            v1[2] + dirZ * offsetRatio
+        ];
+        
+        const end = [
+            v2[0] - dirX * offsetRatio,
+            v2[1] - dirY * offsetRatio,
+            v2[2] - dirZ * offsetRatio
+        ];
+        
+        const lineGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array([
+            start[0], start[1], start[2],
+            end[0], end[1], end[2]
+        ]);
+        lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const color = edgeColors.get(edgeStr);
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: color,
+            linewidth: 2,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        const line = new THREE.Line(lineGeometry, lineMaterial);
+        wireframeMesh.add(line);
+    }
+    
     scene.add(wireframeMesh);
     
     // Update Info
@@ -376,6 +546,60 @@ function updateInfo() {
     document.getElementById('edgeCount').textContent = edgeCount;
     document.getElementById('edgeLengthCount').textContent = uniqueEdgeLengths;
     document.getElementById('faceCount').textContent = faceCount;
+    
+    // Update build instructions
+    updateBuildInstructions();
+}
+
+function updateBuildInstructions() {
+    if (!geodesicSphere) return;
+    
+    const diameter = parseFloat(document.getElementById('diameter').value) || 100;
+    const connectorOffset = parseFloat(document.getElementById('connectorOffset').value) || 0;
+    
+    // Color palette matching the 3D visualization
+    const colors = [
+        '#ff0000', // Red - Type A
+        '#00ff00', // Green - Type B
+        '#0000ff', // Blue - Type C
+        '#ffff00', // Yellow - Type D
+        '#ff00ff', // Magenta - Type E
+        '#00ffff', // Cyan - Type F
+    ];
+    
+    // Update strut table
+    const strutTable = document.getElementById('strutTable').getElementsByTagName('tbody')[0];
+    strutTable.innerHTML = '';
+    
+    const edgeDetails = geodesicSphere.getEdgeLengthDetails(diameter, connectorOffset);
+    for (let i = 0; i < edgeDetails.length; i++) {
+        const edge = edgeDetails[i];
+        const row = strutTable.insertRow();
+        
+        // Type column
+        row.insertCell(0).textContent = edge.type;
+        
+        // Color column with color box
+        const colorCell = row.insertCell(1);
+        const colorBox = document.createElement('div');
+        colorBox.className = 'color-box';
+        colorBox.style.backgroundColor = colors[i % colors.length];
+        colorCell.appendChild(colorBox);
+        
+        // Quantity column
+        row.insertCell(2).textContent = edge.count;
+        
+        // Length column
+        row.insertCell(3).textContent = edge.length.toFixed(2);
+    }
+    
+    // Update connector counts
+    const valences = geodesicSphere.getVertexValences();
+    document.getElementById('connector5Count').textContent = valences.count5;
+    document.getElementById('connector6Count').textContent = valences.count6;
+    
+    // Update patch count
+    document.getElementById('patchCount').textContent = geodesicSphere.faces.length;
 }
 
 function updateVisibility() {
