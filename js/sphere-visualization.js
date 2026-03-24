@@ -94,6 +94,8 @@ function updateSphere() {
     // Update struts with new frequency-scaled parameters
     showTestStrut();
     showStrutsOnEdges();
+    showConnectorPieces();
+    showConnectorStruts();
 }
 
 function updateInfo() {
@@ -164,7 +166,7 @@ function updateBuildInstructions() {
 
 function updateVisibility() {
     const showFaces = document.getElementById('showFaces').checked;
-    const showWireframe = document.getElementById('showWireframe').checked;
+    const showWireframe = document.getElementById('showEdgesWireframe').checked;
     
     if (faceMesh) faceMesh.visible = showFaces;
     if (wireframeMesh) wireframeMesh.visible = showWireframe;

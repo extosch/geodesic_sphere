@@ -42,13 +42,16 @@ function init() {
     
     // Event Listeners
     document.getElementById('showFaces').addEventListener('change', updateVisibility);
-    document.getElementById('showWireframe').addEventListener('change', updateVisibility);
+    document.getElementById('showEdgesWireframe').addEventListener('change', updateVisibility);
     document.getElementById('autoRotate').addEventListener('change', (e) => {
         autoRotate = e.target.checked;
     });
     document.getElementById('showCenterTestStrut').addEventListener('change', updateTestStrutVisibility);
     document.getElementById('showEdgeStrutsFaces').addEventListener('change', updateTestStrutVisibility);
     document.getElementById('showEdgeStrutsWireframe').addEventListener('change', updateTestStrutVisibility);
+    document.getElementById('showConnectorsWireframe').addEventListener('change', updateConnectorVisibility);
+    document.getElementById('showConnectorStrutsFaces').addEventListener('change', updateConnectorStrutsVisibility);
+    document.getElementById('showConnectorStrutsWireframe').addEventListener('change', updateConnectorStrutsVisibility);
     document.getElementById('exportDxfBtn').addEventListener('click', exportTestStrutToDXF);
     document.getElementById('testDxfBtn').addEventListener('click', exportSimpleCircleDXF);
     document.getElementById('frequency').addEventListener('input', () => {
@@ -126,6 +129,18 @@ function setupControls() {
                 edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
                 edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
             }
+            if (connectorWireframeGroup) {
+                connectorWireframeGroup.rotation.y = faceMesh.rotation.y;
+                connectorWireframeGroup.rotation.x = faceMesh.rotation.x;
+            }
+            if (connectorStrutFacesGroup) {
+                connectorStrutFacesGroup.rotation.y = faceMesh.rotation.y;
+                connectorStrutFacesGroup.rotation.x = faceMesh.rotation.x;
+            }
+            if (connectorStrutWireframeGroup) {
+                connectorStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
+                connectorStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
+            }
         } else if (isPanning) {
             const deltaX = e.clientX - previousMousePosition.x;
             const deltaY = e.clientY - previousMousePosition.y;
@@ -186,6 +201,18 @@ function animate() {
         if (edgeStrutWireframeGroup) {
             edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
             edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
+        }
+        if (connectorWireframeGroup) {
+            connectorWireframeGroup.rotation.y = faceMesh.rotation.y;
+            connectorWireframeGroup.rotation.x = faceMesh.rotation.x;
+        }
+        if (connectorStrutFacesGroup) {
+            connectorStrutFacesGroup.rotation.y = faceMesh.rotation.y;
+            connectorStrutFacesGroup.rotation.x = faceMesh.rotation.x;
+        }
+        if (connectorStrutWireframeGroup) {
+            connectorStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
+            connectorStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
         }
     }
     

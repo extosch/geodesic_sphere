@@ -17,6 +17,13 @@ let testStrutLabelMesh = null;
 let edgeStrutFacesGroup = null;
 let edgeStrutWireframeGroup = null;
 
+// Connector wireframe (shows connector offset regions)
+let connectorWireframeGroup = null;
+
+// Connector struts (2D capsule components on connector edges)
+let connectorStrutFacesGroup = null;
+let connectorStrutWireframeGroup = null;
+
 // Base strut parameters (for Frequency 1)
 // These scale with 1/frequency for higher frequencies
 const baseStrutParams = {

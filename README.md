@@ -1,6 +1,18 @@
 # Geodätische Kugel Visualisierung
 
-Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler Frequenz, basierend auf der sukzessiven Unterteilung eines Ikosaeders.
+Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler Frequenz, basierend auf der sukzessiven Unterteilung eines Ikosaeders. Ziel ist die physikalische Konstruktion einer Geodäsie-Kugel aus flachen Blechbauteilen (Struts und Connectors).
+
+## Terminologie
+
+| Begriff | Beschreibung |
+|---|---|
+| **Vertex** | Eckpunkt der geodätischen Kugel, liegt auf der Kugeloberfläche |
+| **Original Edge** | Volle Verbindungslinie zwischen zwei Vertices |
+| **Shortened Edge** | Original Edge abzüglich 2× Connector Offset von beiden Enden – hier liegt der Strut |
+| **Connector Edge** | Kurzes Stück vom Vertex zum Endpunkt der Shortened Edge |
+| **Edge Strut** | 2D-Blechbauteil (Kapselform) auf einer Shortened Edge |
+| **Connector** | Hub-Bauteil (Stern mit 5 oder 6 Armen) am Vertex, verbindet alle anliegenden Struts |
+| **Connector Arm** | Ein einzelner Arm des Connectors entlang einer Connector Edge |
 
 ## Funktionen
 
@@ -8,96 +20,95 @@ Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler 
   - Auto-Update bei Frequenzänderung (kein separater Update-Button erforderlich)
   - Frequency-based Scaling: Alle Parameter skalieren automatisch mit 1/frequency
   
-- **Visualisierungsoptionen**: 
-  - Flächendarstellung (grau)
-  - Gittermodell (weiß, farbcodiert nach Kantenlänge)
-  - Edge Struts (2D-Streben auf allen Kanten)
-    - Farbige Faces nach Kantentyp
-    - Weiße Wireframe-Umrisse
-    - Tangentiale Orientierung zur Kugeloberfläche
-  - Center Test Strut (Entwicklungs-/Testzwecke)
-  - Alle Modi unabhängig ein-/ausschaltbar
-  
+- **Visualisierungsoptionen** (alle unabhängig ein-/ausschaltbar):
+
+  | Checkbox | Beschreibung |
+  |---|---|
+  | Show Faces | Graue Flächendarstellung der Kugel |
+  | Show Edges (Wireframe) | Kantennetz, farbcodiert nach Kantentyp |
+  | Show Edge Struts (Faces) | 2D-Streben auf Shortened Edges, farbige Faces |
+  | Show Edge Struts (Wireframe) | Weiße Umrisse der Edge Struts |
+  | Show Connectors (Wireframe) | Weiße Linien: Vertex → Shortened-Edge-Endpunkt |
+  | Show Connector Struts (Faces) | 2D-Kapselformen auf Connector Edges (grau) |
+  | Show Connector Struts (Wireframe) | Weiße Umrisse der Connector Struts |
+  | Show Center Test Strut | Einzelstrut im Ursprung (Entwicklung/Test) |
+  | Auto-Rotation | Automatische Rotation der Kugel |
+
 - **Physikalische Konstruktionsparameter**:
   - Durchmesser (cm): Skalierung der gesamten Kugel
-  - Connector Offset (cm): Abstand vom Hub-Zentrum zum Streben-Ende
+  - Connector Offset (cm): Länge eines Connector Arms (Abstand Vertex → Strut-Ende)
     - Automatische Anzeige des skalierten Werts basierend auf Frequenz
-    - Verkürzte Kanten in der Visualisierung
   - Streben-Breite (B) und Bohrungsradius (R) skalieren automatisch mit Frequenz
   
 - **Build Instructions**:
-  - Tabelle mit Kantenlängen nach Typ
+  - Tabelle mit Kantenlängen nach Typ (A, B, C...)
   - Farbcodierung (Rot/Grün/Blau/Gelb)
   - Anzahl benötigter Streben pro Typ
-  - Connector-Analyse (5-arm vs. 6-arm Hubs)
+  - Connector-Analyse: Anzahl 5-Arm vs. 6-Arm Hubs  
   - Anzahl der Dreiecks-Patches
   
 - **DXF Export**:
-  - Export von Test Struts als DXF-Datei für CNC/Laserschnitt
+  - Export von Edge Struts als DXF-Datei für CNC/Laserschnitt
   - Kapsel-Form mit Bohrungen an beiden Enden
   - Maßhaltige Konstruktion in mm
   - Layer-Organisation (OUTLINE, HOLES, LABELS)
   
-- **Geometrie-Informationen**: 
-  - Anzahl der Ecken
-  - Anzahl der Kanten
-  - Anzahl unterschiedlicher Kantenlängen
-  - Anzahl der Dreiecke
-  
+- **Geometrie-Informationen**: Anzahl Ecken, Kanten, Kantentypen, Dreiecke
+
 - **Interaktive Steuerung**:
-  - Auto-Rotation um die eigene Achse
   - Linke Maustaste: Manuelle Rotation
   - Rechte Maustaste: Pan (Verschieben)
   - Mausrad: Zoom
 
 ## Technologie
 
-- **HTML5**: Struktur der Webseite
-- **CSS3**: Styling mit dunklem Theme
-- **JavaScript**: Logik und Algorithmus (modulare Architektur)
-  - `main.js`: Globale Variablen und Scaling-Funktionen
-  - `geodesic-sphere.js`: Geodätischer Algorithmus (GeodesicSphere Klasse)
-  - `dxf-export.js`: DXF-Export für CNC/Laserschnitt
-  - `strut-visualization.js`: 2D-Streben auf Kanten
-  - `sphere-visualization.js`: 3D-Kugel-Rendering
-  - `three-setup.js`: Three.js Initialisierung und Steuerung
-- **Three.js (WebGL)**: 3D-Rendering und Visualisierung
+- **Three.js r128 (WebGL)**: 3D-Rendering, BufferGeometry, LineSegments
+- **JavaScript (ES6, modular)**:
+  - `js/main.js`: Globale Variablen, Scaling-Funktionen (`getScaledStrutParams`, `getScaledConnectorOffset`)
+  - `js/geodesic-sphere.js`: GeodesicSphere-Klasse – Ikosaeder-Unterteilung, Vertex/Edge/Face-Daten
+  - `js/sphere-visualization.js`: Kugel-Mesh, Wireframe, Sichtbarkeit, Build Instructions
+  - `js/strut-visualization.js`: Edge Struts (2D-Kapseln auf Shortened Edges)
+  - `js/connector-visualization.js`: Connector Wireframe + Connector Struts
+  - `js/three-setup.js`: Three.js-Init, Maus-Rotation, Event Listener
+  - `js/dxf-export.js`: DXF-Export für CNC/Laserschnitt
+- **HTML5/CSS3**: Struktur und dunkles Theme
 
 ## Algorithmus
 
-Der Algorithmus basiert auf der sukzessiven Unterteilung eines regulären Ikosaeders:
+### Ikosaeder-Basis (F=1)
+- 12 Vertices (goldener Schnitt), 30 Kanten, 20 gleichseitige Dreiecke
+- Alle Vertices auf Einheitskugel normalisiert
 
-1. **Ikosaeder-Basis (F=1)**: 
-   - 12 Ecken
-   - 20 gleichseitige Dreiecke
-   - Vertices werden auf eine Einheitskugel normalisiert
+### Unterteilung (F>1)
+- Jedes Dreieck → F² kleinere Dreiecke
+- Neue Punkte per baryzentrischer Interpolation, dann auf Kugeloberfläche projiziert
+- Resultat: annähernd gleichmäßige Verteilung aller Vertices
 
-2. **Unterteilung (F>1)**:
-   - Jedes Dreieck wird in frequency² kleinere Dreiecke unterteilt
-   - Kanten werden in F gleiche Abschnitte geteilt
-   - Neue Punkte werden auf die Kugeloberfläche projiziert
-   - Baryzentrische Koordinaten für präzise Interpolation
+### Edge Struts
+- Für jede Kante: Start- und Endpunkt werden um `offsetRatio = connectorOffset / radius` verschoben
+- Koordinatensystem per `THREE.Matrix4.makeBasis()`:
+  - X-Achse: entlang der Shortened Edge
+  - Y-Achse: tangential zur Kugeloberfläche
+  - Z-Achse: radial nach außen
+- Alle Koordinaten in **Unit Sphere Space** (kein zusätzlicher radius-Faktor)
 
-3. **Normalisierung**:
-   - Alle Vertices werden auf Einheitsabstand vom Zentrum projiziert
-   - Ergebnis ist eine annähernd perfekte Kugel mit gleichmäßig verteilten Dreiecken
+### Connector Wireframe
+- Für jede Kante: zwei Linien (`Vertex → Shortened-Edge-Endpunkt`)
+- Gleicher Koordinatenraum wie Edge Struts (Unit Sphere Space)
+- Rotation: manuell synchronisiert mit `faceMesh.rotation` in Three-Setup
 
-4. **Edge Struts (Kantenverstrebungen)**:
-   - 2D-Streben werden auf jeder Kante der geodätischen Kugel platziert
-   - Koordinatensystem:
-     - X-Achse: entlang der Kante
-     - Y-Achse: tangential zur Kugeloberfläche
-     - Z-Achse: radial nach außen
-   - Rotation mit THREE.Matrix4.makeBasis() für präzise Orientierung
-   - Kanten werden um Connector Offset verkürzt (von beiden Enden)
-   - Kapsel-Form: Hauptrechteck + Halbkreisenden + Bohrungen
+### Frequency-based Scaling
+- Basiswerte für F=1: B=0.1, R=0.02, Connector Offset=7.0 cm
+- Alle Werte skalieren mit `1/frequency`
 
-5. **Frequency-based Scaling**:
-   - Basis-Werte definiert für Frequenz 1:
-     - Streben-Breite (B): 0.1
-     - Bohrungsradius (R): 0.02  
-     - Connector Offset: 7.0 cm
-   - Skalierung mit Faktor 1/frequency
+## Offene Design-Frage: Flacher Connector
+
+Der aktuelle Connector-Mittelpunkt liegt auf der Kugeloberfläche. Die 5 bzw. 6 Arm-Endpunkte liegen ebenfalls auf der Kugel – sie sind damit **näherungsweise, aber nicht exakt koplanar**.
+
+Für ein aus Blech schneidbares Bauteil ist ein **vollständig flacher Connector** erforderlich. Geplante Lösung (Strategie C):
+- Best-Fit-Ebene der 5/6 Arm-Endpunkte berechnen
+- Vertex V auf diese Ebene projizieren → V' (liegt leicht innerhalb der Kugel)
+- Connector-Linien von V' statt V → vollständig planar, laser-schneidbar
    - Beispiel Freq 2: B=0.05, R=0.01, Offset=3.5cm
    - Gewährleistet proportionale Geometrie bei allen Frequenzen
 
