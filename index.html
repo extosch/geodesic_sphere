@@ -30,6 +30,14 @@
             </div>
             
             <div class="control-group">
+                <label for="geometryMode">Strut Mode:</label>
+                <select id="geometryMode" style="width: 100%; padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 13px;">
+                    <option value="classic">Klassisch (mehrere Struttypen)</option>
+                    <option value="einheitsstrut">Einheitsstrut (ein Struttyp)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
                 <label>
                     <input type="checkbox" id="showFaces">
                     Show Faces
@@ -38,21 +46,21 @@
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showEdgesWireframe">
+                    <input type="checkbox" id="showEdgesWireframe" checked>
                     Show Edges (Wireframe)
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showEdgeStrutsFaces" checked>
+                    <input type="checkbox" id="showEdgeStrutsFaces">
                     Show Edge Struts (Faces)
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showEdgeStrutsWireframe" checked>
+                    <input type="checkbox" id="showEdgeStrutsWireframe">
                     Show Edge Struts (Wireframe)
                 </label>
             </div>
@@ -66,14 +74,14 @@
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showConnectorStrutsFaces" checked>
+                    <input type="checkbox" id="showConnectorStrutsFaces">
                     Show Connector Struts (Faces)
                 </label>
             </div>
             
             <div class="control-group">
                 <label>
-                    <input type="checkbox" id="showConnectorStrutsWireframe" checked>
+                    <input type="checkbox" id="showConnectorStrutsWireframe">
                     Show Connector Struts (Wireframe)
                 </label>
             </div>
@@ -93,11 +101,7 @@
             </div>
             
             <div class="control-group">
-                <button id="exportDxfBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export Test Strut as DXF</button>
-            </div>
-            
-            <div class="control-group">
-                <button id="testDxfBtn" style="width: 100%; padding: 10px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">TEST: Export Simple Circle DXF</button>
+                <button id="exportAllDxfBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export All DXF</button>
             </div>
             
             <div class="info-panel">
@@ -151,7 +155,24 @@
                             <span class="info-label">6-Arm Connectors:</span>
                             <span id="connector6Count">0</span>
                         </div>
+                        <div class="info-item">
+                            <span class="info-label">Distinct Types:</span>
+                            <span id="connectorTypeCount">0</span>
+                        </div>
                     </div>
+                    <table id="connectorTypeTable" class="build-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Arms</th>
+                                <th>Pattern</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 
                 <div class="build-section">

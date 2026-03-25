@@ -29,8 +29,8 @@ Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler 
   | Show Edge Struts (Faces) | 2D-Streben auf Shortened Edges, farbige Faces |
   | Show Edge Struts (Wireframe) | Weiße Umrisse der Edge Struts |
   | Show Connectors (Wireframe) | Weiße Linien: Vertex → Shortened-Edge-Endpunkt |
-  | Show Connector Struts (Faces) | 2D-Kapselformen auf Connector Edges (grau) |
-  | Show Connector Struts (Wireframe) | Weiße Umrisse der Connector Struts |
+  | Show Connector Struts (Faces) | Flaches 2D-Sternbauteil pro Vertex (5/6 Arme) mit Bohrungen |
+  | Show Connector Struts (Wireframe) | Weiße Umrisse der flachen Connector-Sternkontur |
   | Show Center Test Strut | Einzelstrut im Ursprung (Entwicklung/Test) |
   | Auto-Rotation | Automatische Rotation der Kugel |
 
@@ -101,16 +101,20 @@ Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler 
 - Basiswerte für F=1: B=0.1, R=0.02, Connector Offset=7.0 cm
 - Alle Werte skalieren mit `1/frequency`
 
-## Offene Design-Frage: Flacher Connector
+## Connector-Umsetzung (Strategie C)
 
-Der aktuelle Connector-Mittelpunkt liegt auf der Kugeloberfläche. Die 5 bzw. 6 Arm-Endpunkte liegen ebenfalls auf der Kugel – sie sind damit **näherungsweise, aber nicht exakt koplanar**.
+Der flache Connector ist jetzt als **ein einziges 2D-Sternbauteil pro Vertex** implementiert:
+- Best-Fit-Ebene aus den Arm-Endpunkten (Newell) berechnen
+- Vertex V auf diese Ebene projizieren → Connector-Zentrum V'
+- Alle Arm-Endpunkte in ein lokales 2D-System projizieren
+- Geschlossene umlaufende Kontur aus parallelen Arm-Grenzlinien erzeugen
+- Übergangspunkte T_k als Schnitt von Nachbar-Grenzlinien berechnen
+- Halbkreis-Spitze pro Arm (B/2) plus Bohrung (R) am Armende
 
-Für ein aus Blech schneidbares Bauteil ist ein **vollständig flacher Connector** erforderlich. Geplante Lösung (Strategie C):
-- Best-Fit-Ebene der 5/6 Arm-Endpunkte berechnen
-- Vertex V auf diese Ebene projizieren → V' (liegt leicht innerhalb der Kugel)
-- Connector-Linien von V' statt V → vollständig planar, laser-schneidbar
-   - Beispiel Freq 2: B=0.05, R=0.01, Offset=3.5cm
-   - Gewährleistet proportionale Geometrie bei allen Frequenzen
+Stand 2026-03-24:
+- Orientierung der Halbkreise auf „außen“ korrigiert
+- Nachbarschaft für T_k auf korrekte benachbarte Armseiten korrigiert
+- Connector Struts standardmäßig im UI deaktiviert (Checkboxen aus)
 
 ## Installation & Verwendung
 
@@ -122,6 +126,7 @@ Für ein aus Blech schneidbares Bauteil ist ein **vollständig flacher Connector
    - `js/geodesic-sphere.js`
    - `js/dxf-export.js`
    - `js/strut-visualization.js`
+  - `js/connector-visualization.js`
    - `js/sphere-visualization.js`
    - `js/three-setup.js`
 
@@ -140,9 +145,11 @@ Für ein aus Blech schneidbares Bauteil ist ein **vollständig flacher Connector
    - Manuelle Änderung passt den Basiswert an
 4. **Visualisierung anpassen**: 
    - Aktivieren/Deaktivieren Sie "Show Faces" (Kugeloberfläche)
-   - Aktivieren/Deaktivieren Sie "Show Wireframe" (Kanten-Gitter)
+  - Aktivieren/Deaktivieren Sie "Show Edges (Wireframe)" (Kanten-Gitter)
    - Aktivieren/Deaktivieren Sie "Show Edge Struts Faces" (farbige Streben)
    - Aktivieren/Deaktivieren Sie "Show Edge Struts Wireframe" (Streben-Umrisse)
+  - Aktivieren/Deaktivieren Sie "Show Connectors (Wireframe)" (Connector-Linien)
+  - Aktivieren/Deaktivieren Sie "Show Connector Struts (Faces/Wireframe)" (flache Connector-Sternbauteile)
    - Aktivieren/Deaktivieren Sie "Show Center Test Strut" (Test-Strebe)
    - Aktivieren/Deaktivieren Sie "Auto-Rotation"
 5. **DXF Export**: 
@@ -222,8 +229,9 @@ Beispiel bei Frequenz 4:
 Kanten werden an beiden Enden verkürzt:
 ```
 offsetRatio = connectorOffset / sphereRadius
-shortened_start = original_start × (1 + offsetRatio)
-shortened_end = original_end × (1 - offsetRatio)
+dir = normalize(end - start)
+shortened_start = start + dir × offsetRatio
+shortened_end = end - dir × offsetRatio
 ```
 
 ## Browser-Kompatibilität

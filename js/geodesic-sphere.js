@@ -313,4 +313,35 @@ class GeodesicSphere {
         
         return geometry;
     }
+
+    // Returns a Map: edgeStr -> typeIndex (0 = shortest edge type, 1 = next, ...)
+    getEdgeTypeMap() {
+        const lengths = [];
+        for (const edgeStr of this.edges) {
+            const [i, j] = JSON.parse(edgeStr);
+            const a = this.vertices[i], b = this.vertices[j];
+            const dx = b[0]-a[0], dy = b[1]-a[1], dz = b[2]-a[2];
+            lengths.push({ edgeStr, len: Math.sqrt(dx*dx+dy*dy+dz*dz) });
+        }
+        lengths.sort((a, b) => a.len - b.len);
+
+        const tol = 1e-6;
+        const groups = [];
+        let currentLen = -1;
+        for (const item of lengths) {
+            if (groups.length === 0 || Math.abs(item.len - currentLen) > tol) {
+                groups.push([]);
+                currentLen = item.len;
+            }
+            groups[groups.length - 1].push(item.edgeStr);
+        }
+
+        const map = new Map();
+        for (let t = 0; t < groups.length; t++) {
+            for (const edgeStr of groups[t]) {
+                map.set(edgeStr, t);
+            }
+        }
+        return map;
+    }
 }

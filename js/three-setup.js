@@ -52,8 +52,11 @@ function init() {
     document.getElementById('showConnectorsWireframe').addEventListener('change', updateConnectorVisibility);
     document.getElementById('showConnectorStrutsFaces').addEventListener('change', updateConnectorStrutsVisibility);
     document.getElementById('showConnectorStrutsWireframe').addEventListener('change', updateConnectorStrutsVisibility);
-    document.getElementById('exportDxfBtn').addEventListener('click', exportTestStrutToDXF);
-    document.getElementById('testDxfBtn').addEventListener('click', exportSimpleCircleDXF);
+    document.getElementById('geometryMode').addEventListener('change', (e) => {
+        currentMode = e.target.value;
+        updateSphere();
+    });
+    document.getElementById('exportAllDxfBtn').addEventListener('click', exportAllDXF);
     document.getElementById('frequency').addEventListener('input', () => {
         updateConnectorOffsetDisplay();
         updateSphere();
