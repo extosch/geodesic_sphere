@@ -182,7 +182,9 @@ function buildConnectorDxf(typeName, arms2D, B_mm, R_mm, qty) {
 function getDxfPrefix() {
     const freq = parseInt(document.getElementById('frequency').value) || 1;
     const diam = Math.round(parseFloat(document.getElementById('diameter').value) || 100);
-    return `Geo_F${freq}_D${diam}cm`;
+    const width = getScaledStrutWidth();
+    const offset = getScaledConnectorOffset();
+    return `Geo_F${freq}_D${diam}cm_W${width.toFixed(1)}cm_O${offset.toFixed(1)}cm`;
 }
 
 // ─── Gather All Export Data ───

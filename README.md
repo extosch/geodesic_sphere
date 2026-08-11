@@ -36,9 +36,12 @@ Eine interaktive Webseite zur Visualisierung geodätischer Kugeln mit variabler 
 
 - **Physikalische Konstruktionsparameter**:
   - Durchmesser (cm): Skalierung der gesamten Kugel
+  - Width (cm): Breite von Edge-Struts und Connector-Armen
+    - Feld zeigt den skalierten Wert basierend auf Frequenz
+    - Manuelle Änderung passt den Basiswert an
   - Connector Offset (cm): Länge eines Connector Arms (Abstand Vertex → Strut-Ende)
     - Automatische Anzeige des skalierten Werts basierend auf Frequenz
-  - Streben-Breite (B) und Bohrungsradius (R) skalieren automatisch mit Frequenz
+  - Bohrungsradius (R) skaliert automatisch mit Frequenz
   
 - **Build Instructions**:
   - Tabelle mit Kantenlängen nach Typ (A, B, C...)
@@ -139,11 +142,15 @@ Stand 2026-03-24:
 1. **Frequenz einstellen**: Geben Sie eine Zahl zwischen 1 und 10 ein
    - Die Geometrie wird automatisch aktualisiert
    - Connector Offset Feld zeigt automatisch den skalierten Wert
+  - Width Feld zeigt automatisch den skalierten Wert
 2. **Durchmesser anpassen**: Ändern Sie die Größe der Kugel (10-1000 cm)
-3. **Connector Offset einstellen**: Abstand vom Hub-Zentrum (0-10 cm)
+3. **Width einstellen**: Breite von Edge-Struts und Connector-Armen
+  - Wird automatisch mit Frequenz skaliert
+  - Manuelle Änderung passt den Basiswert an
+4. **Connector Offset einstellen**: Abstand vom Hub-Zentrum (0-10 cm)
    - Wird automatisch mit Frequenz skaliert
    - Manuelle Änderung passt den Basiswert an
-4. **Visualisierung anpassen**: 
+5. **Visualisierung anpassen**: 
    - Aktivieren/Deaktivieren Sie "Show Faces" (Kugeloberfläche)
   - Aktivieren/Deaktivieren Sie "Show Edges (Wireframe)" (Kanten-Gitter)
    - Aktivieren/Deaktivieren Sie "Show Edge Struts Faces" (farbige Streben)
@@ -152,10 +159,10 @@ Stand 2026-03-24:
   - Aktivieren/Deaktivieren Sie "Show Connector Struts (Faces/Wireframe)" (flache Connector-Sternbauteile)
    - Aktivieren/Deaktivieren Sie "Show Center Test Strut" (Test-Strebe)
    - Aktivieren/Deaktivieren Sie "Auto-Rotation"
-5. **DXF Export**: 
+6. **DXF Export**: 
    - "Export Test Strut as DXF": Exportiert eine Strebe für CNC/Laserschnitt
    - "TEST: Export Simple Circle DXF": Test-Export eines einfachen Kreises
-6. **Navigation**:
+7. **Navigation**:
    - Linke Maustaste gedrückt halten und ziehen: Rotation
    - Rechte Maustaste gedrückt halten und ziehen: Pan
    - Mausrad: Zoom in/out

@@ -1,0 +1,11 @@
+# Render-Ausgaben (Fusion 360 Screenshots)
+render/
+
+# Export-Artefakte der App
+*.dxf
+*.stl
+
+# Windows / Dropbox
+Thumbs.db
+desktop.ini
+*.tmp

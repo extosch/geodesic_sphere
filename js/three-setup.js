@@ -39,6 +39,7 @@ function init() {
     
     // Update UI display for scaled connector offset
     updateConnectorOffsetDisplay();
+    updateStrutWidthDisplay();
     
     // Event Listeners
     document.getElementById('showFaces').addEventListener('change', updateVisibility);
@@ -57,12 +58,21 @@ function init() {
         updateSphere();
     });
     document.getElementById('exportAllDxfBtn').addEventListener('click', exportAllDXF);
+    document.getElementById('exportSTLBtn').addEventListener('click', exportSTL);
+    document.getElementById('exportBatchSTLBtn').addEventListener('click', exportBatchSTL);
     document.getElementById('frequency').addEventListener('input', () => {
         updateConnectorOffsetDisplay();
+        updateStrutWidthDisplay();
         updateSphere();
     });
-    document.getElementById('diameter').addEventListener('input', updateBuildInstructions);
-    document.getElementById('diameter').addEventListener('change', updateBuildInstructions);
+    document.getElementById('diameter').addEventListener('input', () => {
+        updateBuildInstructions();
+        updateSphere();
+    });
+    document.getElementById('diameter').addEventListener('change', () => {
+        updateBuildInstructions();
+        updateSphere();
+    });
     document.getElementById('connectorOffset').addEventListener('input', () => {
         updateBaseConnectorOffsetFromUI();
         updateBuildInstructions();
@@ -72,6 +82,14 @@ function init() {
         updateBaseConnectorOffsetFromUI();
         updateBuildInstructions();
         updateSphere(); // Update 3D visualization with shortened struts
+    });
+    document.getElementById('strutWidth').addEventListener('input', () => {
+        updateBaseStrutWidthFromUI();
+        updateSphere();
+    });
+    document.getElementById('strutWidth').addEventListener('change', () => {
+        updateBaseStrutWidthFromUI();
+        updateSphere();
     });
     
     window.addEventListener('resize', onWindowResize);
