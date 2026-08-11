@@ -395,7 +395,7 @@ function updateConnectorStrutsVisibility() {
     }
 }
 
-// --- Uniform (Einheitsstrut) mode variants ---
+// --- Uniform mode variants ---
 
 // Computes per-vertex connector data with variable arm lengths (uniform strut mode).
 // Each arm extends by half the excess of its edge so struts of length L_min fit.

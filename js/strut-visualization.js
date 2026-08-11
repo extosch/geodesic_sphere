@@ -47,13 +47,13 @@ function showTestStrut() {
     // In uniform mode, use L_min if sphere is available
     let strutL = strutParams.L;
     let labelText = 'Type A';
-    if (currentMode === 'einheitsstrut' && geodesicSphere) {
+    if (currentMode === 'uniform' && geodesicSphere) {
         const connectorOffset = getScaledConnectorOffset();
         const diameter = parseFloat(document.getElementById('diameter').value) || 100;
         const offsetRatio = connectorOffset / (diameter / 2);
         const { L_min } = computeEdgeOffsets(geodesicSphere, offsetRatio);
         strutL = L_min;
-        labelText = 'Einheitsstrut';
+        labelText = 'Uniform';
     }
     
     // Create strut shape
@@ -97,7 +97,18 @@ function showTestStrut() {
     context.fillStyle = 'rgba(0, 0, 0, 0)';
     context.fillRect(0, 0, canvas.width, canvas.height);
     
-    context.font = 'Bold 64px Arial';
+    // Shrink the font if the label would overrun the fixed canvas. Sizing the
+    // text to fit lets the plane below keep the canvas aspect ratio, which is
+    // what stops the glyphs from being stretched.
+    let fontSize = 64;
+    context.font = `Bold ${fontSize}px Arial`;
+    const maxTextWidth = canvas.width * 0.9;
+    const measured = context.measureText(labelText).width;
+    if (measured > maxTextWidth) {
+        fontSize = Math.floor((fontSize * maxTextWidth) / measured);
+        context.font = `Bold ${fontSize}px Arial`;
+    }
+
     context.fillStyle = 'white';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
@@ -108,7 +119,10 @@ function showTestStrut() {
     // We need to scale from unit sphere to match
     const B = strutParams.B;
     const textHeightUnits = Math.min(B * 0.85, 0.1); // 85% of width, max 0.1 units
-    const textWidthUnits = textHeightUnits * (labelText.length > 6 ? 5 : 4); // Wider for 'Einheitsstrut'
+    // The texture maps the whole canvas, so the plane has to carry the canvas
+    // aspect ratio — a wider plane would stretch the glyphs rather than fit
+    // more text
+    const textWidthUnits = textHeightUnits * (canvas.width / canvas.height);
     
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;

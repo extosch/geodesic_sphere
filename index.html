@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geodesic Sphere Visualization!</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <title>Geodesic Sphere Builder — DXF &amp; STL export</title>
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <div class="container">
         <div class="controls">
             <h1>Geodesic Sphere</h1>
-            
+
+            <details open>
+                <summary>Geometry</summary>
             <div class="control-group">
                 <label for="frequency">Frequency (F):</label>
                 <input type="number" id="frequency" min="1" max="10" value="3">
             </div>
-            
             <div class="control-group">
                 <label for="diameter">Diameter (cm):</label>
                 <input type="number" id="diameter" min="10" max="1000" value="100" step="10">
             </div>
-
             <div class="control-group">
                 <label for="strutWidth">Width (cm):</label>
                 <input type="number" id="strutWidth" min="0.1" max="50" value="5.0" step="0.5">
@@ -28,7 +28,6 @@
                     Edge and connector arm width
                 </small>
             </div>
-            
             <div class="control-group">
                 <label for="connectorOffset">Connector Offset (cm):</label>
                 <input type="number" id="connectorOffset" min="0" max="10" value="7" step="0.5">
@@ -36,92 +35,89 @@
                     Distance from hub center to strut end
                 </small>
             </div>
-            
             <div class="control-group">
                 <label for="geometryMode">Strut Mode:</label>
                 <select id="geometryMode" style="width: 100%; padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 13px;">
-                    <option value="classic">Klassisch (mehrere Struttypen)</option>
-                    <option value="einheitsstrut">Einheitsstrut (ein Struttyp)</option>
+                    <option value="classic">Classic (multiple strut types)</option>
+                    <option value="uniform">Uniform (single strut type)</option>
                 </select>
             </div>
+            </details>
 
+            <details>
+                <summary>Display</summary>
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showFaces">
                     Show Faces
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showEdgesWireframe" checked>
                     Show Edges (Wireframe)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showEdgeStrutsFaces" checked>
                     Show Edge Struts (Faces)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showEdgeStrutsWireframe">
                     Show Edge Struts (Wireframe)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showConnectorsWireframe" checked>
                     Show Connectors (Wireframe)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showConnectorStrutsFaces">
                     Show Connector Struts (Faces)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showConnectorStrutsWireframe">
                     Show Connector Struts (Wireframe)
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="showCenterTestStrut">
                     Show Center Test Strut
                 </label>
             </div>
-            
             <div class="control-group">
                 <label>
                     <input type="checkbox" id="autoRotate" checked>
                     Auto-Rotation
                 </label>
             </div>
-            
+            </details>
+
+            <details>
+                <summary>Export</summary>
             <div class="control-group">
                 <button id="exportAllDxfBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export All DXF</button>
             </div>
-            
             <div class="control-group">
                 <button id="exportSTLBtn" style="width: 100%; padding: 10px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export STL (3D Mesh)</button>
             </div>
-            
             <div class="control-group">
-                <button id="exportBatchSTLBtn" style="width: 100%; padding: 10px; background: #FF5722; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export STL (je Typ)</button>
+                <button id="exportBatchSTLBtn" style="width: 100%; padding: 10px; background: #FF5722; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export STL (per Type)</button>
             </div>
-            
+            </details>
+
+            <details open>
+                <summary>Geometry Information</summary>
             <div class="info-panel">
-                <h3>Geometry Information</h3>
                 <div class="info-item">
                     <span class="info-label">Number of Vertices:</span>
                     <span id="vertexCount">0</span>
@@ -139,9 +135,11 @@
                     <span id="faceCount">0</span>
                 </div>
             </div>
-            
+            </details>
+
+            <details>
+                <summary>Build Instructions</summary>
             <div class="build-panel">
-                <h3>Build Instructions</h3>
                 
                 <div class="build-section">
                     <h4>Struts (Sticks)</h4>
@@ -199,15 +197,18 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="instructions">
-                <h3>Controls</h3>
-                <ul>
-                    <li>Left Mouse Button: Rotation</li>
-                    <li>Right Mouse Button: Pan</li>
-                    <li>Mouse Wheel: Zoom</li>
-                </ul>
-            </div>
+            </details>
+
+            <details>
+                <summary>Controls</summary>
+                <div class="instructions">
+                    <ul>
+                        <li>Drag with the left mouse button, or one finger: rotate</li>
+                        <li>Drag with the right mouse button, or two fingers: pan</li>
+                        <li>Mouse wheel, or pinch: zoom</li>
+                    </ul>
+                </div>
+            </details>
         </div>
         
         <div id="canvas-container"></div>
@@ -217,13 +218,13 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
-    <script src="js/main.js?v=2"></script>
-    <script src="js/geodesic-sphere.js?v=2"></script>
-    <script src="js/dxf-export.js?v=2"></script>
-    <script src="js/strut-visualization.js?v=2"></script>
-    <script src="js/connector-visualization.js?v=2"></script>
-    <script src="js/sphere-visualization.js?v=2"></script>
-    <script src="js/stl-export.js?v=2"></script>
-    <script src="js/three-setup.js?v=2"></script>
+    <script src="js/main.js?v=3"></script>
+    <script src="js/geodesic-sphere.js?v=3"></script>
+    <script src="js/dxf-export.js?v=3"></script>
+    <script src="js/strut-visualization.js?v=3"></script>
+    <script src="js/connector-visualization.js?v=3"></script>
+    <script src="js/sphere-visualization.js?v=3"></script>
+    <script src="js/stl-export.js?v=3"></script>
+    <script src="js/three-setup.js?v=3"></script>
 </body>
 </html>

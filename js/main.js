@@ -24,7 +24,7 @@ let connectorWireframeGroup = null;
 let connectorStrutFacesGroup = null;
 let connectorStrutWireframeGroup = null;
 
-// Geometry mode: 'classic' (multiple strut types) or 'einheitsstrut' (single strut type)
+// Geometry mode: 'classic' (multiple strut types) or 'uniform' (single strut type)
 let currentMode = 'classic';
 
 // Base strut parameters (for Frequency 1)

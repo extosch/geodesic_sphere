@@ -151,7 +151,7 @@ function updateInfo() {
     const vertexCount = geodesicSphere.vertices.length;
     const edgeCount = geodesicSphere.edges.size;
     const faceCount = geodesicSphere.faces.length;
-    const uniqueEdgeLengths = currentMode === 'einheitsstrut' ? 1 : geodesicSphere.getUniqueEdgeLengths();
+    const uniqueEdgeLengths = currentMode === 'uniform' ? 1 : geodesicSphere.getUniqueEdgeLengths();
     
     document.getElementById('vertexCount').textContent = vertexCount;
     document.getElementById('edgeCount').textContent = edgeCount;

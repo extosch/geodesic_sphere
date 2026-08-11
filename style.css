@@ -42,6 +42,62 @@ h3 {
     padding-bottom: 8px;
 }
 
+/* Collapsible sections of the control panel. Native details/summary, so the
+   keyboard and screen-reader behaviour comes for free; summary is styled to
+   match the h3 headings it replaced. */
+details {
+    margin-bottom: 18px;
+}
+
+details:last-child {
+    margin-bottom: 0;
+}
+
+summary {
+    font-size: 16px;
+    color: #cccccc;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;              /* replaced by the arrow below */
+}
+
+summary::-webkit-details-marker {
+    display: none;                 /* Safari keeps its own marker otherwise */
+}
+
+summary::before {
+    content: "▸";
+    color: #0066cc;
+    font-size: 14px;
+    transition: transform 0.15s ease;
+}
+
+details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+summary:hover {
+    color: #ffffff;
+}
+
+summary:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
+
+/* The panels bring their own bottom margin, which would stack with the one
+   on details */
+details > .info-panel,
+details > .build-panel {
+    margin-bottom: 0;
+}
+
 .control-group {
     margin-bottom: 20px;
 }

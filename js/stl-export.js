@@ -7,7 +7,7 @@ const STL_THICKNESS_MM = 3.0; // Default material thickness
 
 function exportSTL() {
     if (!geodesicSphere) {
-        alert('Bitte zuerst eine Kugel erzeugen.');
+        alert('Generate a sphere first.');
         return;
     }
 
@@ -178,7 +178,7 @@ function applyStrutOrientation(mesh, sdx, sdy, sdz, midX, midY, midZ) {
 // Sum of all exported STL files = complete assembled 3D sphere.
 
 function exportBatchSTL() {
-    if (!geodesicSphere) { alert('Bitte zuerst eine Kugel erzeugen.'); return; }
+    if (!geodesicSphere) { alert('Generate a sphere first.'); return; }
 
     const diameter = parseFloat(document.getElementById('diameter').value) || 100;
     const radius = diameter / 2;
@@ -199,7 +199,7 @@ function exportBatchSTL() {
     const strutTypeGroups = new Map();
     for (const edgeStr of geodesicSphere.edges) {
         let typeLetter;
-        if (currentMode === 'einheitsstrut') {
+        if (currentMode === 'uniform') {
             typeLetter = 'Uni';
         } else {
             const typeIdx = edgeTypeMap.get(edgeStr);
@@ -211,7 +211,7 @@ function exportBatchSTL() {
 
     // Uniform mode: precompute edge offsets once
     let edgeMapUniform = null, L_minUniform = 0;
-    if (currentMode === 'einheitsstrut') {
+    if (currentMode === 'uniform') {
         const result = computeEdgeOffsets(geodesicSphere, offsetRatio);
         edgeMapUniform = result.edgeMap;
         L_minUniform = result.L_min;
@@ -352,7 +352,7 @@ function exportBatchSTL() {
 
 function exportOBJ() {
     if (!geodesicSphere) {
-        alert('Bitte zuerst eine Kugel erzeugen.');
+        alert('Generate a sphere first.');
         return;
     }
 
@@ -413,7 +413,7 @@ function exportOBJ() {
 
 function exportGLB() {
     if (!geodesicSphere) {
-        alert('Bitte zuerst eine Kugel erzeugen.');
+        alert('Generate a sphere first.');
         return;
     }
 
