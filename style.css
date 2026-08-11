@@ -331,11 +331,12 @@ button:disabled:hover {
     display: inline-block;
 }
 
-/* Narrow screens: stack the canvas above the controls and let the page scroll.
-   The control panel keeps its 320px, so side by side leaves the canvas about
-   70px wide on a phone in portrait — a sliver, with nothing scrollable to
-   reach the rest. Below this breakpoint the two stack instead. */
-@media (max-width: 820px) {
+/* Stack the canvas above the controls and let the page scroll, whenever side
+   by side would not work: on anything narrow (the 320px panel leaves a phone
+   in portrait about 70px of canvas — a sliver) and on anything held upright,
+   where a column beside the panel leaves the sphere stranded in a tall empty
+   strip. The comma is an OR. */
+@media (max-width: 820px), (orientation: portrait) {
     /* Let the document scroll rather than the body box, so the sticky canvas
        below has a scrolling ancestor it can pin against */
     body {
@@ -367,5 +368,9 @@ button:disabled:hover {
         overflow-y: visible;
         border-right: none;
         border-top: 2px solid #333;
+        /* Fill whatever height is left. With every section collapsed the panel
+           is shorter than a tall screen, and the page background would
+           otherwise show through below it as a stray black band. */
+        flex: 1 0 auto;
     }
 }
