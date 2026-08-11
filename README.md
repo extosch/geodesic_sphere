@@ -152,4 +152,7 @@ The prompt the whole thing originally grew from is kept in
 
 ## License
 
-Free to use for educational and private purposes.
+[MIT](LICENSE) — use it for anything, including commercially. No warranty.
+
+Note that the exported DXF and STL files describe load-bearing parts. Verify dimensions and
+material strength yourself before cutting anything you intend to stand under.
