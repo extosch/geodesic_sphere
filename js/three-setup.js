@@ -40,7 +40,11 @@ function init() {
     // Update UI display for scaled connector offset
     updateConnectorOffsetDisplay();
     updateStrutWidthDisplay();
-    
+
+    // Adopt the checkbox default declared in index.html, so the markup stays
+    // the single source of truth for it
+    autoRotate = document.getElementById('autoRotate').checked;
+
     // Event Listeners
     document.getElementById('showFaces').addEventListener('change', updateVisibility);
     document.getElementById('showEdgesWireframe').addEventListener('change', updateVisibility);
