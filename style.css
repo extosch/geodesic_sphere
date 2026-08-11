@@ -149,6 +149,37 @@ button:active {
     background-color: #004080;
 }
 
+/* Export buttons. The colours used to sit in inline style attributes, which
+   outrank any stylesheet rule and so made a disabled state impossible to
+   show. */
+.export-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.export-dxf { background-color: #4CAF50; }
+.export-stl { background-color: #2196F3; }
+.export-stl-batch { background-color: #FF5722; }
+
+.export-dxf:hover { background-color: #429647; }
+.export-stl:hover { background-color: #1c7fd0; }
+.export-stl-batch:hover { background-color: #d94a1e; }
+
+button:disabled,
+button:disabled:hover {
+    background-color: #3a3a3a;
+    color: #777777;
+    cursor: not-allowed;
+}
+
+.export-note {
+    color: #888888;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: -8px;
+}
+
 .info-panel {
     background-color: #2a2a2a;
     padding: 15px;

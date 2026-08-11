@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geodesic Sphere Builder — DXF &amp; STL export</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <div class="container">
@@ -104,15 +104,20 @@
 
             <details>
                 <summary>Export</summary>
-            <div class="control-group">
-                <button id="exportAllDxfBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export All DXF</button>
-            </div>
-            <div class="control-group">
-                <button id="exportSTLBtn" style="width: 100%; padding: 10px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export STL (3D Mesh)</button>
-            </div>
-            <div class="control-group">
-                <button id="exportBatchSTLBtn" style="width: 100%; padding: 10px; background: #FF5722; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export STL (per Type)</button>
-            </div>
+                <div class="control-group">
+                    <button id="exportAllDxfBtn" class="export-btn export-dxf" disabled>Export All DXF</button>
+                </div>
+                <div class="control-group">
+                    <button id="exportSTLBtn" class="export-btn export-stl" disabled>Export STL (3D Mesh)</button>
+                </div>
+                <div class="control-group">
+                    <button id="exportBatchSTLBtn" class="export-btn export-stl-batch" disabled>Export STL (per Type)</button>
+                </div>
+                <p class="export-note">
+                    Export is switched off while the output is being verified against
+                    real cutting and printing. The geometry and the build instructions
+                    above are unaffected.
+                </p>
             </details>
 
             <details>
@@ -218,13 +223,13 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
-    <script src="js/main.js?v=3"></script>
-    <script src="js/geodesic-sphere.js?v=3"></script>
-    <script src="js/dxf-export.js?v=3"></script>
-    <script src="js/strut-visualization.js?v=3"></script>
-    <script src="js/connector-visualization.js?v=3"></script>
-    <script src="js/sphere-visualization.js?v=3"></script>
-    <script src="js/stl-export.js?v=3"></script>
-    <script src="js/three-setup.js?v=3"></script>
+    <script src="js/main.js?v=4"></script>
+    <script src="js/geodesic-sphere.js?v=4"></script>
+    <script src="js/dxf-export.js?v=4"></script>
+    <script src="js/strut-visualization.js?v=4"></script>
+    <script src="js/connector-visualization.js?v=4"></script>
+    <script src="js/sphere-visualization.js?v=4"></script>
+    <script src="js/stl-export.js?v=4"></script>
+    <script src="js/three-setup.js?v=4"></script>
 </body>
 </html>

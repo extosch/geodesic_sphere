@@ -65,16 +65,23 @@ Plus auto-rotation. Drag with the left mouse button to rotate, right button to p
 **Build instructions** are generated live: a table of edge lengths grouped by type (A, B, C…)
 with the quantity needed for each, the number of 5-arm vs. 6-arm connectors, and the patch count.
 
-**Exports:**
+**Exports** — currently switched off in the hosted version, see the note below:
 
 | Button | Output |
 |---|---|
 | Export All DXF | One DXF per part type — flat 2D outlines with holes, in mm, layered (OUTLINE / HOLES / LABELS) |
 | Export STL (3D Mesh) | The whole assembled sphere as a single STL |
-| Export STL (je Typ) | One STL per part type, containing every instance of that type positioned in 3D. The files together reassemble the complete sphere |
+| Export STL (per Type) | One STL per part type, containing every instance of that type positioned in 3D. The files together reassemble the complete sphere |
 
 Exported filenames encode the parameters they were made with, e.g.
 `Geo_F3_D100cm_W1.7cm_O2.3cm_A_Strut_x30.stl`, so you can tell prints apart later.
+
+> **The export buttons are disabled for now.** The exporters are written and the
+> code is in the repository, but nothing cut or printed from the current version
+> has been checked against the files it produces — and a strut whose holes do not
+> line up wastes real material. They go back on once a test patch has been cut and
+> assembled. If you want them sooner, clone the repo and remove the `disabled`
+> attributes in `index.html`; everything behind them works.
 
 ## Terminology
 
