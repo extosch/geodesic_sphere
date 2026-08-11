@@ -134,8 +134,21 @@ Any browser with WebGL: Chrome, Edge, Firefox, Safari, Opera. Built against Thre
 
 Built with Three.js and vanilla JavaScript — no framework, no build tooling.
 
-Developed with AI assistance (GitHub Copilot and Anthropic's Claude models). The prompt that
-started it is kept in [docs/original-prompt.md](docs/original-prompt.md).
+This project was written with AI assistance from the start, and the *kind* of assistance
+changed along the way — which turned out to matter more than the choice of model:
+
+- **February 2026 onwards** — GitHub Copilot in VS Code, alongside Claude Sonnet 4.5 in a
+  chat window. Autocomplete and copy-paste. Everything lived in a single `script.js`.
+- **From March 2026** — Claude Code as a VS Code extension, latterly with Opus 5. Agentic
+  rather than autocomplete: it reads the codebase, changes several files at once and runs
+  the tooling itself. The split into `js/` modules, the connector geometry and the DXF and
+  STL exporters came out of working that way.
+
+The commit history still shows the seam. Single commits weeks apart at the beginning — then
+five in one day on 23 March 2026, including the refactor from one file into six modules.
+
+The prompt the whole thing originally grew from is kept in
+[docs/original-prompt.md](docs/original-prompt.md).
 
 ## License
 
