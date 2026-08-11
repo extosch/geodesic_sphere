@@ -5,6 +5,13 @@ render/
 *.dxf
 *.stl
 
+# Editor-Einstellungen (persoenlich, nicht projektrelevant)
+.vscode/
+
+# Private Projektnotizen — bleiben lokal, gehoeren nicht ins oeffentliche Repo
+luxus-geodaesische-leuchte-plan.md
+hackathon_submission.txt
+
 # Windows / Dropbox
 Thumbs.db
 desktop.ini
