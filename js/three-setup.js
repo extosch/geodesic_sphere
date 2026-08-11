@@ -40,7 +40,10 @@ function init() {
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    // Cap the pixel ratio: phones report 3 and up, which would render the
+    // several hundred extruded struts at nine times the pixel count for no
+    // visible gain
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
     
     // Lights
@@ -125,14 +128,49 @@ function init() {
     animate();
 }
 
+const ROTATION_SPEED = 0.005;
+const PAN_SPEED = 0.002;
+const PINCH_SPEED = 0.015;
+
+// The visualization groups are siblings rather than children of a shared
+// pivot, so each carries its own rotation and they have to be brought back
+// into step by hand after faceMesh moves.
+function syncRotation() {
+    const groups = [
+        wireframeMesh, testStrutFacesMesh, testStrutWireframeMesh,
+        testStrutLabelMesh, edgeStrutFacesGroup, edgeStrutWireframeGroup,
+        connectorWireframeGroup, connectorStrutFacesGroup,
+        connectorStrutWireframeGroup
+    ];
+    for (const group of groups) {
+        if (!group) continue;
+        group.rotation.y = faceMesh.rotation.y;
+        group.rotation.x = faceMesh.rotation.x;
+    }
+}
+
+// Rotate the whole assembly by a pointer movement given in pixels
+function rotateBy(deltaX, deltaY) {
+    faceMesh.rotation.y += deltaX * ROTATION_SPEED;
+    faceMesh.rotation.x += deltaY * ROTATION_SPEED;
+    syncRotation();
+}
+
+function panBy(deltaX, deltaY) {
+    camera.position.x -= deltaX * PAN_SPEED;
+    camera.position.y += deltaY * PAN_SPEED;
+}
+
+function zoomBy(delta) {
+    camera.position.z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, camera.position.z + delta));
+}
+
 function setupControls() {
     const canvas = renderer.domElement;
     let isDragging = false;
     let isPanning = false;
     let previousMousePosition = { x: 0, y: 0 };
-    const rotationSpeed = 0.005;
-    const panSpeed = 0.002;
-    
+
     canvas.addEventListener('mousedown', (e) => {
         if (e.button === 0) { // Left mouse button
             isDragging = true;
@@ -143,57 +181,15 @@ function setupControls() {
     });
     
     canvas.addEventListener('mousemove', (e) => {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
         if (isDragging && faceMesh) {
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
-            
-            faceMesh.rotation.y += deltaX * rotationSpeed;
-            faceMesh.rotation.x += deltaY * rotationSpeed;
-            
-            if (wireframeMesh) {
-                wireframeMesh.rotation.y = faceMesh.rotation.y;
-                wireframeMesh.rotation.x = faceMesh.rotation.x;
-            }
-            if (testStrutFacesMesh) {
-                testStrutFacesMesh.rotation.y = faceMesh.rotation.y;
-                testStrutFacesMesh.rotation.x = faceMesh.rotation.x;
-            }
-            if (testStrutWireframeMesh) {
-                testStrutWireframeMesh.rotation.y = faceMesh.rotation.y;
-                testStrutWireframeMesh.rotation.x = faceMesh.rotation.x;
-            }
-            if (testStrutLabelMesh) {
-                testStrutLabelMesh.rotation.y = faceMesh.rotation.y;
-                testStrutLabelMesh.rotation.x = faceMesh.rotation.x;
-            }
-            if (edgeStrutFacesGroup) {
-                edgeStrutFacesGroup.rotation.y = faceMesh.rotation.y;
-                edgeStrutFacesGroup.rotation.x = faceMesh.rotation.x;
-            }
-            if (edgeStrutWireframeGroup) {
-                edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
-                edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
-            }
-            if (connectorWireframeGroup) {
-                connectorWireframeGroup.rotation.y = faceMesh.rotation.y;
-                connectorWireframeGroup.rotation.x = faceMesh.rotation.x;
-            }
-            if (connectorStrutFacesGroup) {
-                connectorStrutFacesGroup.rotation.y = faceMesh.rotation.y;
-                connectorStrutFacesGroup.rotation.x = faceMesh.rotation.x;
-            }
-            if (connectorStrutWireframeGroup) {
-                connectorStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
-                connectorStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
-            }
+            rotateBy(deltaX, deltaY);
         } else if (isPanning) {
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
-            
-            camera.position.x -= deltaX * panSpeed;
-            camera.position.y += deltaY * panSpeed;
+            panBy(deltaX, deltaY);
         }
-        
+
         previousMousePosition = { x: e.clientX, y: e.clientY };
     });
     
@@ -209,10 +205,64 @@ function setupControls() {
     
     canvas.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY * 0.001;
-        camera.position.z += delta;
-        camera.position.z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, camera.position.z));
+        zoomBy(e.deltaY * 0.001);
     });
+
+    // Touch: one finger rotates, two fingers pinch to zoom and drag to pan.
+    // preventDefault stops the browser from scrolling the page or triggering
+    // its own pinch-zoom while a gesture is on the canvas; the controls sit
+    // below the canvas on narrow layouts, so the page stays scrollable there.
+    let touchPrevious = null;
+    let pinchPrevious = 0;
+
+    const centroid = (touches) => {
+        const second = touches[1] || touches[0];
+        return {
+            x: (touches[0].clientX + second.clientX) / 2,
+            y: (touches[0].clientY + second.clientY) / 2
+        };
+    };
+    const spread = (touches) => Math.hypot(
+        touches[0].clientX - touches[1].clientX,
+        touches[0].clientY - touches[1].clientY
+    );
+
+    const beginTouch = (e) => {
+        touchPrevious = e.touches.length ? centroid(e.touches) : null;
+        pinchPrevious = e.touches.length >= 2 ? spread(e.touches) : 0;
+    };
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        beginTouch(e);
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!touchPrevious || !e.touches.length) return;
+
+        const current = centroid(e.touches);
+        const deltaX = current.x - touchPrevious.x;
+        const deltaY = current.y - touchPrevious.y;
+
+        if (e.touches.length === 1) {
+            if (faceMesh) rotateBy(deltaX, deltaY);
+        } else {
+            const currentSpread = spread(e.touches);
+            if (pinchPrevious > 0) {
+                zoomBy((pinchPrevious - currentSpread) * PINCH_SPEED);
+            }
+            pinchPrevious = currentSpread;
+            panBy(deltaX, deltaY);
+        }
+
+        touchPrevious = current;
+    }, { passive: false });
+
+    // Recompute from the remaining touches: lifting one finger of a pinch must
+    // not make the other finger jump the model by the centroid difference.
+    canvas.addEventListener('touchend', beginTouch);
+    canvas.addEventListener('touchcancel', beginTouch);
     
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 }
@@ -223,42 +273,7 @@ function animate() {
     // Auto-Rotation
     if (faceMesh && autoRotate) {
         faceMesh.rotation.y += 0.005;
-        if (wireframeMesh) {
-            wireframeMesh.rotation.y = faceMesh.rotation.y;
-            wireframeMesh.rotation.x = faceMesh.rotation.x;
-        }
-        if (testStrutFacesMesh) {
-            testStrutFacesMesh.rotation.y = faceMesh.rotation.y;
-            testStrutFacesMesh.rotation.x = faceMesh.rotation.x;
-        }
-        if (testStrutWireframeMesh) {
-            testStrutWireframeMesh.rotation.y = faceMesh.rotation.y;
-            testStrutWireframeMesh.rotation.x = faceMesh.rotation.x;
-        }
-        if (testStrutLabelMesh) {
-            testStrutLabelMesh.rotation.y = faceMesh.rotation.y;
-            testStrutLabelMesh.rotation.x = faceMesh.rotation.x;
-        }
-        if (edgeStrutFacesGroup) {
-            edgeStrutFacesGroup.rotation.y = faceMesh.rotation.y;
-            edgeStrutFacesGroup.rotation.x = faceMesh.rotation.x;
-        }
-        if (edgeStrutWireframeGroup) {
-            edgeStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
-            edgeStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
-        }
-        if (connectorWireframeGroup) {
-            connectorWireframeGroup.rotation.y = faceMesh.rotation.y;
-            connectorWireframeGroup.rotation.x = faceMesh.rotation.x;
-        }
-        if (connectorStrutFacesGroup) {
-            connectorStrutFacesGroup.rotation.y = faceMesh.rotation.y;
-            connectorStrutFacesGroup.rotation.x = faceMesh.rotation.x;
-        }
-        if (connectorStrutWireframeGroup) {
-            connectorStrutWireframeGroup.rotation.y = faceMesh.rotation.y;
-            connectorStrutWireframeGroup.rotation.x = faceMesh.rotation.x;
-        }
+        syncRotation();
     }
     
     renderer.render(scene, camera);
