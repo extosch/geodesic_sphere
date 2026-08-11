@@ -3,6 +3,8 @@
 A browser-based generator for geodesic spheres — from geometry and part lists all the way to
 DXF and STL files you can send to a laser cutter, CNC router or 3D printer.
 
+**▶ [Try it live](https://extosch.github.io/geodesic_sphere/)** — no install, runs in the browser.
+
 ![A frequency-4 geodesic sphere built from flat wooden struts and star-shaped connectors](docs/screenshot.jpg)
 
 You want to build a geodesic sphere but don't know where to start. This tool generates the
@@ -12,6 +14,11 @@ and exports them as ready-to-cut files. The render above was produced from its D
 No build step, no dependencies to install — open `index.html` and it runs.
 
 ## Quick start
+
+The hosted version at **[extosch.github.io/geodesic_sphere](https://extosch.github.io/geodesic_sphere/)**
+is always current — nothing to install.
+
+To run it locally:
 
 ```bash
 git clone https://github.com/extosch/geodesic_sphere.git
