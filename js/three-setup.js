@@ -1,6 +1,26 @@
 // Three.js Setup and Controls
 // Initialize scene, camera, renderer and handle user interactions
 
+// Zoom limits, shared by the initial framing and the mouse wheel
+const ZOOM_MIN = 1.5;
+const ZOOM_MAX = 10;
+
+// Camera distance at which the unit sphere fills SPHERE_FILL of the tighter
+// viewport dimension. Computed rather than fixed: the control panel has a set
+// width, so on a narrow window the canvas ends up taller than wide and the
+// horizontal field of view — not the vertical one — becomes the limit. A fixed
+// distance tuned on a desktop clips the sphere on a phone.
+const SPHERE_FILL = 0.78;
+
+function framingDistance(fill = SPHERE_FILL) {
+    const vFovHalf = (camera.fov * Math.PI) / 180 / 2;
+    const tightHalf = camera.aspect >= 1
+        ? vFovHalf
+        : Math.atan(Math.tan(vFovHalf) * camera.aspect);
+    const distance = 1 / (fill * Math.tan(tightHalf));
+    return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, distance));
+}
+
 function init() {
     const container = document.getElementById('canvas-container');
     
@@ -15,8 +35,8 @@ function init() {
         0.1,
         1000
     );
-    camera.position.z = 3;
-    
+    camera.position.z = framingDistance();
+
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -191,7 +211,7 @@ function setupControls() {
         e.preventDefault();
         const delta = e.deltaY * 0.001;
         camera.position.z += delta;
-        camera.position.z = Math.max(1.5, Math.min(10, camera.position.z));
+        camera.position.z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, camera.position.z));
     });
     
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -249,6 +269,11 @@ function onWindowResize() {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
+
+    // Pull back if the new aspect would clip the sphere — a phone turned from
+    // landscape to portrait, say. Only ever moves away, so a deliberate
+    // zoom-in by the user survives a resize.
+    camera.position.z = Math.max(camera.position.z, framingDistance(1.0));
 }
 
 // Initialize application when DOM is loaded
