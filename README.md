@@ -168,5 +168,8 @@ The prompt the whole thing originally grew from is kept in
 
 [MIT](LICENSE) — use it for anything, including commercially. No warranty.
 
+The MIT licence covers the code. The exergia logo used as the site icon
+(`favicon-*.png`, `apple-touch-icon.png`) is a trademark and is not covered by it.
+
 Note that the exported DXF and STL files describe load-bearing parts. Verify dimensions and
 material strength yourself before cutting anything you intend to stand under.
