@@ -8,10 +8,12 @@ render/
 # Editor-Einstellungen (persoenlich, nicht projektrelevant)
 .vscode/
 
-# Private Projektnotizen — bleiben lokal, gehoeren nicht ins oeffentliche Repo
+# Private Projektnotizen — bleiben lokal, gehoeren nicht ins oeffentliche Repo.
+# Bewusst ohne Pfad notiert: solche Muster greifen in jedem Verzeichnis, die
+# Dateien bleiben also auch nach einem Verschieben ignoriert.
 luxus-geodaesische-leuchte-plan.md
 hackathon_submission.txt
-docs/linkedin-post.txt
+linkedin-post.txt
 
 # Windows / Dropbox
 Thumbs.db
